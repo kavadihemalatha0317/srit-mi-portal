@@ -4,12 +4,18 @@ import { useRouter } from "next/router";
 export default function Dashboard() {
   const [page, setPage] = useState("dashboard");
   const [user, setUser] = useState({});
+  const [projects, setProjects] = useState([]); // completed projects list
+
   const router = useRouter();
 
   useEffect(() => {
     const roll = localStorage.getItem("currentUser");
     const data = JSON.parse(localStorage.getItem(roll+"_data"));
     setUser(data || {name:"Student", roll:"", dept:"CSM", year:"2nd Year", college:"SRIT"});
+    
+    // DEMO: Ikkada nunchi completed projects theeskuntam
+    const completed = JSON.parse(localStorage.getItem(roll+"_completed")) || [];
+    setProjects(completed);
   },[])
 
   const sidebarStyle = {
@@ -17,7 +23,7 @@ export default function Dashboard() {
     background:"white", color:"#555", border:"none", borderRadius:"10px", 
     cursor:"pointer", fontSize:"16px", fontWeight:"500",
     boxShadow:"0 4px 10px rgba(161,140,209,0.2)",
-    animation:"jump 2s infinite", // JUMP EFFECT FOR ALL
+    animation:"jump 2s infinite",
     transition:"all 0.3s"
   }
 
@@ -42,6 +48,8 @@ export default function Dashboard() {
           50% { transform: translateY(-8px); }
         }
         button:hover { transform: scale(1.03); }
+        table { width:100%; border-collapse: collapse; }
+        th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
       `}</style>
 
@@ -58,45 +66,65 @@ export default function Dashboard() {
           <button onClick={()=>setPage("notification")} style={page==="notification"?activeSidebar:sidebarStyle}>Notification</button>
           <button onClick={()=>setPage("reviewapplications")} style={page==="reviewapplications"?activeSidebar:sidebarStyle}>Review Applications</button>
           
-          {/* MY CERTIFICATE WITH SPACE + COLOR */}
-          <div style={{marginTop:"20px", marginBottom:"10px"}}></div>
-          <button onClick={()=>setPage("mycertificate")} style={{...sidebarStyle, background:"linear-gradient(135deg, #FFD700, #FFA500)", color:"white", fontWeight:"bold"}}>My Certificate</button>
+          {/* MY CERTIFICATE - SPACE ICHINANU + COLOR THEESANU */}
+          <div style={{marginTop:"30px"}}></div>
+          <button onClick={()=>setPage("mycertificate")} style={page==="mycertificate"?activeSidebar:sidebarStyle}>My Certificate</button>
           
           <button onClick={()=>{localStorage.removeItem("currentUser"); router.push("/");}} style={logoutStyle}>Logout</button>
         </div>
 
         {/* MAIN CONTENT */}
         <div style={{flex:1, padding:"40px"}}>
-          {page==="profile" && (
-            <div>
-              <h1 style={{color:"#A18CD1", fontSize:"32px"}}>Profile</h1>
-              <div style={{background:"white", padding:"30px", borderRadius:"15px", marginTop:"20px", boxShadow:"0 8px 25px rgba(161,140,209,0.2)", animation:"jump 2s infinite"}}>
-                <p style={{fontSize:"18px", margin:"10px 0"}}><b>Name:</b> {user.name}</p>
-                <p style={{fontSize:"18px", margin:"10px 0"}}><b>Roll No:</b> {user.roll}</p>
-                <p style={{fontSize:"18px", margin:"10px 0"}}><b>Dept:</b> {user.dept}</p>
-                <p style={{fontSize:"18px", margin:"10px 0"}}><b>Year:</b> {user.year}</p>
-                <p style={{fontSize:"18px", margin:"10px 0"}}><b>College:</b> {user.college}</p>
-              </div>
-            </div>
-          )}
-
           {page==="dashboard" && (
             <div>
-              <h1 style={{color:"#A18CD1", fontSize:"32px"}}>Welcome {user.name}! 👋</h1> {/* HI EMOJI ONLY HERE */}
-              <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"25px", marginTop:"30px"}}>
-                <div style={{background:"white", padding:"30px", borderRadius:"15px", boxShadow:"0 8px 25px rgba(161,140,209,0.2)", animation:"jump 2s infinite"}}>
-                  <h3 style={{color:"#555"}}>No. of Projects Done</h3>
-                  <p style={{fontSize:"40px", color:"#A18CD1", fontWeight:"bold"}}>0</p>
-                </div>
-                <div style={{background:"white", padding:"30px", borderRadius:"15px", boxShadow:"0 8px 25px rgba(161,140,209,0.2)", animation:"jump 2s infinite"}}>
-                  <h3 style={{color:"#555"}}>Applications</h3>
-                  <p style={{fontSize:"40px", color:"#FF6B9D", fontWeight:"bold"}}>0</p>
-                </div>
+              <h1 style={{color:"#A18CD1", fontSize:"32px"}}>Welcome {user.name}! 👋</h1>
+              
+              <div style={{background:"white", padding:"30px", borderRadius:"15px", marginTop:"30px", boxShadow:"0 8px 25px rgba(161,140,209,0.2)", animation:"jump 2s infinite"}}>
+                <h3 style={{color:"#555", marginBottom:"15px"}}>No. of Projects Done</h3>
+                
+                {projects.length === 0 ? (
+                  <p style={{fontSize:"18px", color:"gray"}}>No completed projects yet</p>
+                ) : (
+                  <table>
+                    <thead>
+                      <tr style={{background:"#f8f9ff"}}>
+                        <th>Project Name</th>
+                        <th>Start Date</th>
+                        <th>Completion Date</th>
+                        <th>Status</th>
+                        <th>Certificate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {projects.map((p,i)=>(
+                        <tr key={i}>
+                          <td>{p.name}</td>
+                          <td>{p.start}</td>
+                          <td>{p.end}</td>
+                          <td style={{color:p.status==="Yes"?"green":"orange"}}>{p.status}</td>
+                          <td>{p.certificate? <a href={p.certificate}>Download</a> : "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              <div style={{background:"white", padding:"30px", borderRadius:"15px", marginTop:"25px", boxShadow:"0 8px 25px rgba(161,140,209,0.2)", animation:"jump 2s infinite"}}>
+                <h3 style={{color:"#555"}}>Applications</h3>
+                <p style={{fontSize:"40px", color:"#FF6B9D", fontWeight:"bold"}}>0</p>
               </div>
             </div>
           )}
 
-          {page!=="profile" && page!=="dashboard" && (
+          {page==="mycertificate" && (
+            <div style={{background:"white", padding:"40px", borderRadius:"15px", textAlign:"center", animation:"jump 2s infinite"}}>
+              <h1 style={{color:"#A18CD1"}}>My Certificate</h1>
+              <p style={{marginTop:"20px"}}>Coming Soon</p>
+            </div>
+          )}
+
+          {page!=="dashboard" && page!=="mycertificate" && (
             <div style={{background:"white", padding:"40px", borderRadius:"15px", textAlign:"center", animation:"jump 2s infinite"}}>
               <h1 style={{color:"#A18CD1"}}>{page} Page - Coming Soon</h1>
             </div>
