@@ -17,12 +17,29 @@ export default function App() {
     animation:"jump 2s infinite" // JUMPING EFFECT
   }
 
-  const team = [
-    {name:"Rahul", role:"Full Stack Dev"},
-    {name:"Priya", role:"UI/UX Designer"},
-    {name:"Aman", role:"Backend Dev"},
-    {name:"Sneha", role:"Project Lead"}
-  ]
+   const team = [
+  {
+    name:"K.Hemalatha", 
+    roll:"Rollno: 254G1A3353",
+    dept:"Dept: CSM", 
+    role:"Project Manager", 
+    year:"2nd Year"
+  },
+  {
+    name:"M.Hemalatha", 
+    roll:"Rollno: 254G1A3354",
+    dept:"Dept: CSM", 
+    role:"Frontend Developer", 
+    year:"2nd Year"
+  },
+  {
+    name:"M.Jasmitha", 
+    roll:"Rollno: 254G1A3359",
+    dept:"Dept: CSM", 
+    role:"Backend Developer", 
+    year:"2nd Year"
+  }
+]
 
   if (page === "home") {
     return (
