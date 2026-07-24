@@ -19,19 +19,20 @@ export default function Dashboard() {
   return (
     <div>
       <style>{`
-        @keyframes jump {
-          0%, 100% { transform: translateY(0); }
+        @keyframes jumpOnce {
+          0% { transform: translateY(0); }
           50% { transform: translateY(-6px); }
+          100% { transform: translateY(0); }
         }
         .sidebar-btn {
           width:100%; text-align:left; padding:14px 20px; margin:6px 0; 
-          background:white; color:#555; border:none; borderRadius:10px; 
-          cursor:pointer; fontSize:16px; fontWeight:500;
-          boxShadow:0 4px 10px rgba(161,140,209,0.2);
-          transition:all 0.3s;
+          background:white; color:#555; border:none; border-radius:10px; 
+          cursor:pointer; font-size:16px; font-weight:500;
+          box-shadow:0 4px 10px rgba(161,140,209,0.2);
+          transition:background 0.3s, color 0.3s; /* ANIMATION THEESANU */
         }
         .sidebar-btn:hover {
-          animation: jump 0.6s; /* MOUSE PETTINAPPUDE MATRAM JUMP */
+          animation: jumpOnce 0.5s ease; /* MOUSE PETTINAPPUDE OKKA SARI MATRAM */
         }
         .sidebar-btn.active {
           background: linear-gradient(135deg, #4A90E2, #6A5ACD); /* BLUE HIGHLIGHT */
@@ -39,9 +40,12 @@ export default function Dashboard() {
           font-weight: bold;
         }
         .logout-btn {
-          width:100%; padding:14px; marginTop:20px; 
+          width:100%; padding:14px; margin-top:20px; 
           background: linear-gradient(135deg, #FF6B9D, #C44569); 
-          color:white; border:none; borderRadius:10px; fontWeight:bold;
+          color:white; border:none; border-radius:10px; font-weight:bold;
+        }
+        .logout-btn:hover {
+          animation: jumpOnce 0.5s ease;
         }
         table { width:100%; border-collapse: collapse; }
         th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
@@ -55,13 +59,13 @@ export default function Dashboard() {
           
           <button onClick={()=>setPage("profile")} className={`sidebar-btn ${page==="profile"?"active":""}`}>Profile</button>
           <button onClick={()=>setPage("dashboard")} className={`sidebar-btn ${page==="dashboard"?"active":""}`}>Dashboard</button>
-          <button onClick={()=>setPage("myprojects")} className={`sidebar-btn ${page==="myprojects"?"active":""}`}>My Projects</button> {/* WORD KI WORD GAP UNDI */}
+          <button onClick={()=>setPage("myprojects")} className={`sidebar-btn ${page==="myprojects"?"active":""}`}>My Projects</button>
           <button onClick={()=>setPage("applyprojects")} className={`sidebar-btn ${page==="applyprojects"?"active":""}`}>Apply Projects</button>
           <button onClick={()=>setPage("createproject")} className={`sidebar-btn ${page==="createproject"?"active":""}`}>Create Project</button>
           <button onClick={()=>setPage("notification")} className={`sidebar-btn ${page==="notification"?"active":""}`}>Notification</button>
           <button onClick={()=>setPage("reviewapplications")} className={`sidebar-btn ${page==="reviewapplications"?"active":""}`}>Review Applications</button>
           
-          {/* MY CERTIFICATE - GAP THEESANU */}
+          {/* MY CERTIFICATE - NO GAP */}
           <button onClick={()=>setPage("mycertificate")} className={`sidebar-btn ${page==="mycertificate"?"active":""}`}>My Certificate</button>
           
           <button onClick={()=>{localStorage.removeItem("currentUser"); router.push("/");}} className="logout-btn">Logout</button>
