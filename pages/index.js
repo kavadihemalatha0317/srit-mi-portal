@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 
 export default function App() {
-  const [page, setPage] = useState("home");
   
   const buttonStyle = {
     padding:"18px 50px",
@@ -17,79 +16,98 @@ export default function App() {
     animation:"jump 2s infinite" // JUMPING EFFECT
   }
 
-   const team = [
-  {
-    name:"K.Hemalatha", 
-    roll:"Rollno: 254G1A3353",
-    dept:"Dept: CSM", 
-    role:"Project Manager", 
-    year:"2nd Year"
-  },
-  {
-    name:"M.Hemalatha", 
-    roll:"Rollno: 254G1A3354",
-    dept:"Dept: CSM", 
-    role:"Frontend Developer", 
-    year:"2nd Year"
-  },
-  {
-    name:"M.Jasmitha", 
-    roll:"Rollno: 254G1A3359",
-    dept:"Dept: CSM", 
-    role:"Backend Developer", 
-    year:"2nd Year"
-  }
-]
+  const team = [
+    {
+      name:"K.Hemalatha", 
+      roll:"Rollno: 254G1A3353",
+      dept:"Dept: CSM", 
+      role:"Project Manager", 
+      year:"2nd Year"
+    },
+    {
+      name:"M.Hemalatha", 
+      roll:"Rollno: 254G1A3354",
+      dept:"Dept: CSM", 
+      role:"Frontend Developer", 
+      year:"2nd Year"
+    },
+    {
+      name:"M.Jasmitha", 
+      roll:"Rollno: 254G1A3359",
+      dept:"Dept: CSM", 
+      role:"Backend Developer", 
+      year:"2nd Year"
+    }
+  ]
 
-  if (page === "home") {
-    return (
-      <div>
-        <style>{`
-          @keyframes jump {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-          }
-          .btn:hover { transform: scale(1.05); box-shadow: 0 12px 30px rgba(196, 69, 105, 0.6); }
-        `}</style>
+  return (
+    <div>
+      <style>{`
+        @keyframes jump {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 12px 30px rgba(196, 69, 105, 0.6); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+      `}</style>
+      
+      <div style={{fontFamily:"'Segoe UI', Arial", background:"linear-gradient(to right,#FFE5EC,#E8DAFF)", minHeight:"100vh"}}>
         
-        <div style={{fontFamily:"Arial", background:"linear-gradient(to right,#FFE5EC,#E8DAFF)", minHeight:"100vh"}}>
-          
-          {/* HEADER - THICK COLOR */}
-          <header style={{display:"flex",justifyContent:"space-between",padding:"20px 40px",background:"white",boxShadow:"0 4px 15px rgba(0,0,0,0.1)"}}>
-            <h2 style={{color:"#C44569", fontSize:"28px"}}>🎓 SRIT Mini Internship Portal</h2>
-            <button className="btn" onClick={() => window.location.href="/login"} style={{...buttonStyle, padding:"12px 30px", fontSize:"16px", animation:"none"}}>Login</button>
-          </header>
-          
-          {/* HERO SECTION */}
-          <div style={{textAlign:"center",padding:"100px 20px"}}>
-            <h1 style={{fontSize:"48px", color:"#C44569", fontWeight:"900", textShadow:"2px 2px 4px rgba(0,0,0,0.1)"}}>
-              Build Projects. Gain Experience. Get Certified 🚀
-            </h1>
-            <p style={{fontSize:"20px", color:"#555", marginTop:"20px"}}>Join SRIT's official mini internship program</p>
-            <button className="btn" onClick={() => window.location.href="/login"} style={buttonStyle}>Get Started</button>
-          </div>
-
-          {/* TEAM MEMBERS SECTION */}
-          <div style={{padding:"60px 40px", background:"white"}}>
-            <h2 style={{textAlign:"center", color:"#C44569", fontSize:"36px", marginBottom:"40px"}}>👥 Meet Our Team</h2>
-            <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:"30px", maxWidth:"1000px", margin:"0 auto"}}>
-              {team.map((member, i) => (
-                <div key={i} style={{background:"linear-gradient(135deg, #FF6B9D, #C44569)", padding:"30px", borderRadius:"15px", textAlign:"center", color:"white", boxShadow:"0 8px 20px rgba(196,69,105,0.3)"}}>
-                  <div style={{fontSize:"50px"}}>👨‍💻</div>
-                  <h3 style={{marginTop:"10px"}}>{member.name}</h3>
-                  <p>{member.role}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* FOOTER */}
-          <footer style={{textAlign:"center", padding:"20px", background:"#C44569", color:"white"}}>
-            © 2026 SRIT Mini Internship Portal. Made with ❤️
-          </footer>
+        {/* HEADER - THICK COLOR */}
+        <header style={{
+          display:"flex",
+          justifyContent:"space-between",
+          alignItems:"center",
+          padding:"20px 40px",
+          background:"white",
+          boxShadow:"0 4px 15px rgba(0,0,0,0.1)",
+          position:"sticky",
+          top:0,
+          zIndex:100
+        }}>
+          <h2 style={{color:"#C44569", fontSize:"28px", fontWeight:"900"}}>🎓 SRIT Mini Internship Portal</h2>
+          <button className="btn" onClick={() => window.location.href="/login"} style={{...buttonStyle, padding:"12px 30px", fontSize:"16px", animation:"none"}}>Login</button>
+        </header>
+        
+        {/* HERO SECTION */}
+        <div style={{textAlign:"center",padding:"100px 20px"}}>
+          <h1 style={{fontSize:"48px", color:"#C44569", fontWeight:"900", textShadow:"2px 2px 4px rgba(0,0,0,0.1)", lineHeight:"1.3"}}>
+            Build Projects. Gain Experience. Get Certified 🚀
+          </h1>
+          <p style={{fontSize:"20px", color:"#555", marginTop:"20px", marginBottom:"30px"}}>Join SRIT's official mini internship program</p>
+          <button className="btn" onClick={() => window.location.href="/login"} style={buttonStyle}>Get Started</button>
         </div>
+
+        {/* TEAM MEMBERS SECTION */}
+        <div style={{padding:"60px 40px", background:"white"}}>
+          <h2 style={{textAlign:"center", color:"#C44569", fontSize:"36px", marginBottom:"40px", fontWeight:"900"}}>👥 Meet Our Team</h2>
+          <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(250px, 1fr))", gap:"30px", maxWidth:"1000px", margin:"0 auto"}}>
+            {team.map((member, i) => (
+              <div key={i} style={{
+                background:"linear-gradient(135deg, #FF6B9D, #C44569)", 
+                padding:"25px", 
+                borderRadius:"15px", 
+                textAlign:"center", 
+                color:"white", 
+                boxShadow:"0 8px 20px rgba(196,69,105,0.3)",
+                transition:"transform 0.3s"
+              }}>
+                <div style={{fontSize:"50px"}}>👩‍💻</div>
+                <h3 style={{margin:"10px 0 5px 0", fontSize:"22px", fontWeight:"bold"}}>{member.name}</h3>
+                <p style={{margin:"5px 0", fontSize:"14px"}}>{member.roll}</p>
+                <p style={{margin:"5px 0", fontSize:"14px"}}>{member.dept}</p>
+                <p style={{margin:"5px 0", fontSize:"15px", fontWeight:"600"}}>{member.role}</p>
+                <p style={{margin:"5px 0", fontSize:"14px"}}>{member.year}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <footer style={{textAlign:"center", padding:"25px", background:"#C44569", color:"white", fontSize:"16px"}}>
+          © 2026 SRIT Mini Internship Portal. Made with ❤️ by Team CSM
+        </footer>
       </div>
-    )
-  }
-  return <div style={{ padding: "50px", textAlign: "center" }}><h1>Dashboard Coming Soon 😅</h1></div>;
+    </div>
+  )
 }
