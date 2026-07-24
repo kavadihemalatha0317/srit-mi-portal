@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 export default function Dashboard() {
   const [page, setPage] = useState("dashboard");
   const [user, setUser] = useState({});
-  const [projects, setProjects] = useState([]); // completed projects list
+  const [projects, setProjects] = useState([]);
 
   const router = useRouter();
 
@@ -12,42 +12,37 @@ export default function Dashboard() {
     const roll = localStorage.getItem("currentUser");
     const data = JSON.parse(localStorage.getItem(roll+"_data"));
     setUser(data || {name:"Student", roll:"", dept:"CSM", year:"2nd Year", college:"SRIT"});
-    
-    // DEMO: Ikkada nunchi completed projects theeskuntam
     const completed = JSON.parse(localStorage.getItem(roll+"_completed")) || [];
     setProjects(completed);
   },[])
-
-  const sidebarStyle = {
-    width:"100%", textAlign:"left", padding:"14px 20px", margin:"6px 0", 
-    background:"white", color:"#555", border:"none", borderRadius:"10px", 
-    cursor:"pointer", fontSize:"16px", fontWeight:"500",
-    boxShadow:"0 4px 10px rgba(161,140,209,0.2)",
-    animation:"jump 2s infinite",
-    transition:"all 0.3s"
-  }
-
-  const activeSidebar = {
-    ...sidebarStyle,
-    background:"linear-gradient(135deg, #FF6B9D, #A18CD1)",
-    color:"white", fontWeight:"bold"
-  }
-
-  const logoutStyle = {
-    width:"100%", padding:"14px", marginTop:"20px", 
-    background:"linear-gradient(135deg, #FF6B9D, #C44569)", 
-    color:"white", border:"none", borderRadius:"10px", fontWeight:"bold",
-    animation:"jump 2s infinite", boxShadow:"0 4px 15px rgba(196,69,105,0.4)"
-  }
 
   return (
     <div>
       <style>{`
         @keyframes jump {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
+          50% { transform: translateY(-6px); }
         }
-        button:hover { transform: scale(1.03); }
+        .sidebar-btn {
+          width:100%; text-align:left; padding:14px 20px; margin:6px 0; 
+          background:white; color:#555; border:none; borderRadius:10px; 
+          cursor:pointer; fontSize:16px; fontWeight:500;
+          boxShadow:0 4px 10px rgba(161,140,209,0.2);
+          transition:all 0.3s;
+        }
+        .sidebar-btn:hover {
+          animation: jump 0.6s; /* MOUSE PETTINAPPUDE MATRAM JUMP */
+        }
+        .sidebar-btn.active {
+          background: linear-gradient(135deg, #4A90E2, #6A5ACD); /* BLUE HIGHLIGHT */
+          color: white;
+          font-weight: bold;
+        }
+        .logout-btn {
+          width:100%; padding:14px; marginTop:20px; 
+          background: linear-gradient(135deg, #FF6B9D, #C44569); 
+          color:white; border:none; borderRadius:10px; fontWeight:bold;
+        }
         table { width:100%; border-collapse: collapse; }
         th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -58,19 +53,18 @@ export default function Dashboard() {
         <div style={{width:"260px", background:"white", padding:"20px", boxShadow:"4px 0 20px rgba(0,0,0,0.08)"}}>
           <h3 style={{background:"linear-gradient(135deg, #FF6B9D, #A18CD1)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", marginBottom:"25px", fontSize:"22px", fontWeight:"900"}}>Menu</h3>
           
-          <button onClick={()=>setPage("profile")} style={page==="profile"?activeSidebar:sidebarStyle}>Profile</button>
-          <button onClick={()=>setPage("dashboard")} style={page==="dashboard"?activeSidebar:sidebarStyle}>Dashboard</button>
-          <button onClick={()=>setPage("myprojects")} style={page==="myprojects"?activeSidebar:sidebarStyle}>My Projects</button>
-          <button onClick={()=>setPage("applyprojects")} style={page==="applyprojects"?activeSidebar:sidebarStyle}>Apply Projects</button>
-          <button onClick={()=>setPage("createproject")} style={page==="createproject"?activeSidebar:sidebarStyle}>Create Project</button>
-          <button onClick={()=>setPage("notification")} style={page==="notification"?activeSidebar:sidebarStyle}>Notification</button>
-          <button onClick={()=>setPage("reviewapplications")} style={page==="reviewapplications"?activeSidebar:sidebarStyle}>Review Applications</button>
+          <button onClick={()=>setPage("profile")} className={`sidebar-btn ${page==="profile"?"active":""}`}>Profile</button>
+          <button onClick={()=>setPage("dashboard")} className={`sidebar-btn ${page==="dashboard"?"active":""}`}>Dashboard</button>
+          <button onClick={()=>setPage("myprojects")} className={`sidebar-btn ${page==="myprojects"?"active":""}`}>My Projects</button> {/* WORD KI WORD GAP UNDI */}
+          <button onClick={()=>setPage("applyprojects")} className={`sidebar-btn ${page==="applyprojects"?"active":""}`}>Apply Projects</button>
+          <button onClick={()=>setPage("createproject")} className={`sidebar-btn ${page==="createproject"?"active":""}`}>Create Project</button>
+          <button onClick={()=>setPage("notification")} className={`sidebar-btn ${page==="notification"?"active":""}`}>Notification</button>
+          <button onClick={()=>setPage("reviewapplications")} className={`sidebar-btn ${page==="reviewapplications"?"active":""}`}>Review Applications</button>
           
-          {/* MY CERTIFICATE - SPACE ICHINANU + COLOR THEESANU */}
-          <div style={{marginTop:"30px"}}></div>
-          <button onClick={()=>setPage("mycertificate")} style={page==="mycertificate"?activeSidebar:sidebarStyle}>My Certificate</button>
+          {/* MY CERTIFICATE - GAP THEESANU */}
+          <button onClick={()=>setPage("mycertificate")} className={`sidebar-btn ${page==="mycertificate"?"active":""}`}>My Certificate</button>
           
-          <button onClick={()=>{localStorage.removeItem("currentUser"); router.push("/");}} style={logoutStyle}>Logout</button>
+          <button onClick={()=>{localStorage.removeItem("currentUser"); router.push("/");}} className="logout-btn">Logout</button>
         </div>
 
         {/* MAIN CONTENT */}
@@ -78,54 +72,22 @@ export default function Dashboard() {
           {page==="dashboard" && (
             <div>
               <h1 style={{color:"#A18CD1", fontSize:"32px"}}>Welcome {user.name}! 👋</h1>
-              
-              <div style={{background:"white", padding:"30px", borderRadius:"15px", marginTop:"30px", boxShadow:"0 8px 25px rgba(161,140,209,0.2)", animation:"jump 2s infinite"}}>
+              <div style={{background:"white", padding:"30px", borderRadius:"15px", marginTop:"30px", boxShadow:"0 8px 25px rgba(161,140,209,0.2)"}}>
                 <h3 style={{color:"#555", marginBottom:"15px"}}>No. of Projects Done</h3>
-                
                 {projects.length === 0 ? (
                   <p style={{fontSize:"18px", color:"gray"}}>No completed projects yet</p>
                 ) : (
                   <table>
-                    <thead>
-                      <tr style={{background:"#f8f9ff"}}>
-                        <th>Project Name</th>
-                        <th>Start Date</th>
-                        <th>Completion Date</th>
-                        <th>Status</th>
-                        <th>Certificate</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {projects.map((p,i)=>(
-                        <tr key={i}>
-                          <td>{p.name}</td>
-                          <td>{p.start}</td>
-                          <td>{p.end}</td>
-                          <td style={{color:p.status==="Yes"?"green":"orange"}}>{p.status}</td>
-                          <td>{p.certificate? <a href={p.certificate}>Download</a> : "-"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
+                    <thead><tr style={{background:"#f8f9ff"}}><th>Project Name</th><th>Start Date</th><th>Completion Date</th><th>Status</th><th>Certificate</th></tr></thead>
+                    <tbody>{projects.map((p,i)=>(<tr key={i}><td>{p.name}</td><td>{p.start}</td><td>{p.end}</td><td style={{color:p.status==="Yes"?"green":"orange"}}>{p.status}</td><td>{p.certificate? <a href={p.certificate}>Download</a> : "-"}</td></tr>))}</tbody>
                   </table>
                 )}
               </div>
-
-              <div style={{background:"white", padding:"30px", borderRadius:"15px", marginTop:"25px", boxShadow:"0 8px 25px rgba(161,140,209,0.2)", animation:"jump 2s infinite"}}>
-                <h3 style={{color:"#555"}}>Applications</h3>
-                <p style={{fontSize:"40px", color:"#FF6B9D", fontWeight:"bold"}}>0</p>
-              </div>
             </div>
           )}
 
-          {page==="mycertificate" && (
-            <div style={{background:"white", padding:"40px", borderRadius:"15px", textAlign:"center", animation:"jump 2s infinite"}}>
-              <h1 style={{color:"#A18CD1"}}>My Certificate</h1>
-              <p style={{marginTop:"20px"}}>Coming Soon</p>
-            </div>
-          )}
-
-          {page!=="dashboard" && page!=="mycertificate" && (
-            <div style={{background:"white", padding:"40px", borderRadius:"15px", textAlign:"center", animation:"jump 2s infinite"}}>
+          {page!=="dashboard" && (
+            <div style={{background:"white", padding:"40px", borderRadius:"15px", textAlign:"center"}}>
               <h1 style={{color:"#A18CD1"}}>{page} Page - Coming Soon</h1>
             </div>
           )}
