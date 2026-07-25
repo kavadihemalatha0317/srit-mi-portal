@@ -5,7 +5,7 @@ export default function Dashboard() {
   const [page, setPage] = useState("dashboard");
   const [user, setUser] = useState({});
   const [projects, setProjects] = useState([]);
-  const [allProjects, setAllProjects] = useState([]); // For apply dropdown
+  const [allProjects, setAllProjects] = useState([]);
   const [notifications, setNotifications] = useState(0);
   const [selectedProject, setSelectedProject] = useState("");
   const [whyJoin, setWhyJoin] = useState("");
@@ -14,12 +14,28 @@ export default function Dashboard() {
 
   useEffect(() => {
     const roll = localStorage.getItem("currentUser");
-    const data = JSON.parse(localStorage.getItem(roll+"_data"));
-    setUser(data || {name:"Student", roll:"254G1A0000", dept:"CSM", year:"2nd Year", college:"SRIT", email:"student@srit.ac.in"});
+    
+    // FIX 1: Nee real details ikkada pettam
+    const defaultUser = {
+      name:"K.Hemalatha", 
+      roll:"254g1a3353", 
+      dept:"CSM", 
+      year:"2ND Year", 
+      college:"SRIT", 
+      email:"254g1a3353@srit.ac.in"
+    };
+    
+    const data = JSON.parse(localStorage.getItem(roll+"_data")) || defaultUser;
+    setUser(data);
+    
+    // First time ayithe localStorage lo save cheyi
+    if(!localStorage.getItem(roll+"_data")){
+      localStorage.setItem(roll+"_data", JSON.stringify(defaultUser));
+    }
+
     const completed = JSON.parse(localStorage.getItem(roll+"_completed")) || [];
     setProjects(completed);
     
-    // Demo projects for Apply
     const demoProjects = JSON.parse(localStorage.getItem("all_projects")) || [
       {id:1, title:"AI Chatbot", desc:"Build AI chatbot for college", skills:"Python, NLP", limit:"5", duration:"2 Months"},
       {id:2, title:"E-Commerce Website", desc:"MERN stack website", skills:"React, Node", limit:"4", duration:"3 Months"}
@@ -49,15 +65,33 @@ export default function Dashboard() {
     if(Object.values(newProject).some(v=>!v)) return alert("Please fill all fields");
     const roll = localStorage.getItem("currentUser");
     const created = JSON.parse(localStorage.getItem(roll+"_created")) || [];
-    localStorage.setItem(roll+"_created", JSON.stringify([...created, {...newProject, status:"Waiting for Approval"}]));
-    alert("Project Created! Waiting for Admin Approval");
+    
+    // FIX 2: "Waiting for Approval" theesi "Live" chesam
+    localStorage.setItem(roll+"_created", JSON.stringify([...created, {...newProject, status:"Live", creator: user.name}]));
+    
+    // FIX 3: Alert message marcham
+    alert("Project Created Successfully! 🚀 Now Live");
     setNewProject({title:"", desc:"", skills:"", limit:"", duration:""});
   }
+
+  const ProfilePage = () => (
+    <div>
+      <h1 style={{color:"#004D40", fontSize:"32px", marginBottom:"20px"}}>My Profile</h1>
+      <div className="form-card">
+        <p><b>Name:</b> {user.name}</p>
+        <p><b>Roll No:</b> {user.roll}</p>
+        <p><b>Department:</b> {user.dept}</p>
+        <p><b>Year:</b> {user.year}</p>
+        <p><b>College:</b> {user.college}</p>
+        <p><b>Email:</b> {user.email}</p>
+      </div>
+    </div>
+  )
 
   return (
     <div>
       <style>{`
-        @keyframes jumpOnce { 0% { transform: translateY(0); } 50% { transform: translateY(-6px); } 100% { transform: translateY(0); } }
+        @keyframes jumpOnce { 0% { transform: translateY(0); } 50% { transform: translateY(-6px); } 100% { transform: translateY(0); }
         .sidebar-btn { width:100%; text-align:left; padding:14px 20px; margin:6px 0; background:transparent; color:#333; border:none; border-radius:10px; cursor:pointer; font-size:16px; font-weight:500; transition:all 0.3s; display:flex; align-items:center; justify-content:space-between; }
         .sidebar-btn:hover { animation: jumpOnce 0.5s ease; background:#E0F7FA; }
         .sidebar-btn.active { background: linear-gradient(135deg, #004D40, #00796B); color: white; font-weight: bold; }
@@ -66,6 +100,7 @@ export default function Dashboard() {
         .logout-btn:hover { animation: jumpOnce 0.5s ease; }
         .stat-card:hover { animation: jumpOnce 0.5s ease; }
         .form-card { background:white; padding:30px; border-radius:15px; box-shadow:0 8px 25px rgba(0,121,107,0.1); max-width:700px; }
+        .form-card p { font-size:18px; margin:15px 0; color:#333; }
         input, select, textarea { width:100%; padding:12px; margin:10px 0; border:2px solid #B2DFDB; border-radius:8px; font-size:15px; }
         label { font-weight:600; color:#004D40; }
         button.primary { padding:14px 30px; background:linear-gradient(135deg,#00796B,#004D40); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px; }
@@ -91,7 +126,8 @@ export default function Dashboard() {
         {/* MAIN CONTENT */}
         <div style={{flex:1, padding:"40px", overflowY:"auto"}}>
           
-          {/* APPLY PROJECTS FORM */}
+          {page==="profile" && <ProfilePage />}
+
           {page==="applyprojects" && (
             <div>
               <h1 style={{color:"#004D40", fontSize:"32px", marginBottom:"20px"}}>Apply for Project</h1>
@@ -102,6 +138,7 @@ export default function Dashboard() {
                   {allProjects.map(p=><option key={p.id} value={p.title}>{p.title}</option>)}
                 </select>
 
+                {/* FIX 4: Ivi readOnly, auto fill ayipotayi */}
                 <label>Name</label>
                 <input type="text" value={user.name} readOnly />
 
@@ -125,7 +162,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* CREATE PROJECT FORM */}
           {page==="createproject" && (
             <div>
               <h1 style={{color:"#004D40", fontSize:"32px", marginBottom:"20px"}}>Create New Project</h1>
@@ -150,7 +186,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* DASHBOARD */}
           {page==="dashboard" && (
             <div>
               <h1 style={{color:"#004D40", fontSize:"32px"}}>Welcome {user.name}! 👋</h1>
@@ -167,7 +202,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {page!=="dashboard" && page!=="applyprojects" && page!=="createproject" && (
+          {page!=="dashboard" && page!=="applyprojects" && page!=="createproject" && page!=="profile" && (
             <div style={{background:"white", padding:"40px", borderRadius:"15px", textAlign:"center"}}>
               <h1 style={{color:"#004D40"}}>{page} Page - Coming Soon</h1>
             </div>
