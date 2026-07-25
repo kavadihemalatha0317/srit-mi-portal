@@ -1,0 +1,26 @@
+import { useState } from 'react'
+import { useRouter } from 'next/router'
+
+export default function ApplyPage() {
+  const router = useRouter()
+  const { id, creator } = router.query
+  
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    alert(`Application Sent!\n\nTo Creator: ${creator}\nApplicant: ${name} - ${email}\n\nCreator will get notification now`)
+  }
+
+  return (
+    <div style={{padding: '50px'}}>
+      <h1>Apply to Project #{id}</h1>
+      <form onSubmit={handleSubmit}>
+        <input placeholder="Your Name" value={name} onChange={(e)=>setName(e.target.value)} required/><br/><br/>
+        <input placeholder="Your Email" value={email} onChange={(e)=>setEmail(e.target.value)} required/><br/><br/>
+        <button type="submit">Send Application</button>
+      </form>
+    </div>
+  )
+}
