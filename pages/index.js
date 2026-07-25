@@ -1,18 +1,20 @@
 import React from "react";
+import { useRouter } from "next/router"; // router add chesa
 
 export default function App() {
+  const router = useRouter(); // idhi add chesa
+
   const buttonStyle = {
     padding:"16px 40px",
     background:"linear-gradient(135deg, #FF6B9D 0%, #A18CD1 50%, #C44569 100%)",
     color:"white", border:"none", borderRadius:"12px", fontSize:"18px", fontWeight:"bold",
     cursor:"pointer", boxShadow:"0 8px 20px rgba(161, 140, 209, 0.4)"
-    // ANIMATION THEESANU
   }
 
   const team = [
     {name:"K.Hemalatha", roll:"Rollno: 254G1A3353", dept:"Dept: CSM", role:"Project Manager", year:"2nd Year"},
     {name:"M.Hemalatha", roll:"Rollno: 254G1A3354", dept:"Dept: CSM", role:"Frontend Developer", year:"2nd Year"},
-    {name:"M.Jasmitha", roll:"Rollno: 254G1A3359", dept:"Dept: CSM", role:"Backend Developer", year:"2nd Year"}
+    {name:"M.Jasmitha", roll:"Rollno: 254G1A3359", dept:"Dept: CSM", role:"Backend Developer", year:"2nd Year"} // spelling fix
   ]
 
   return (
@@ -37,7 +39,7 @@ export default function App() {
       <div style={{fontFamily:"'Segoe UI', Arial", background:"linear-gradient(to right,#FFE5EC,#E8DAFF)", minHeight:"100vh"}}>
         <header style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"20px 40px",background:"white",boxShadow:"0 4px 15px rgba(0,0,0,0.1)"}}>
           <h2 style={{color:"#A18CD1", fontSize:"28px", fontWeight:"900"}}>SRIT MI Portal</h2>
-          <button onClick={() => window.location.href="/login"} style={buttonStyle} className="jump-hover">Login</button>
+          <button onClick={() => router.push("/login")} style={buttonStyle} className="jump-hover">Login</button> {/* router.push marchanu */}
         </header>
 
         <div style={{textAlign:"center",padding:"100px 20px"}}>
