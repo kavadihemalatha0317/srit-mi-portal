@@ -12,35 +12,26 @@ export default function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false); // Mobile menu kosam
 
   const router = useRouter();
-useEffect(() => {
-  const roll = localStorage.getItem("currentUser");
-  const defaultUser = {name:"K.Hemalatha", roll:"254g1a3353", dept:"CSM", year:"2ND Year", college:"SRIT", email:"254g1a3353@srit.ac.in"};
-  const data = JSON.parse(localStorage.getItem(roll+"_data")) || defaultUser;
-  setUser(data);
-  if(!localStorage.getItem(roll+"_data")) localStorage.setItem(roll+"_data", JSON.stringify(defaultUser));
 
-  // TEAM DB - 3 MEMBERS
-  const teamDB = [
-    {id:1, name:"K.Hemalatha", roll:"254G1A3353", dept:"CSM", role:"Project Manager", year:"2ND Year", email:"254g1a3353@srit.ac.in", img:"👩‍💼"},
-    {id:2, name:"M.Hemalatha", roll:"254G1A3354", dept:"CSM", role:"Frontend Developer", year:"2ND Year", email:"254g1a3354@srit.ac.in", img:"👩‍💻"},
-    {id:3, name:"M.Jasmitha", roll:"254G1A3359", dept:"CSM", role:"Backend Developer", year:"2ND Year", email:"254g1a3359@srit.ac.in", img:"👩‍💻"}
-  ];
-  if(!localStorage.getItem("team_db")) {
-    localStorage.setItem("team_db", JSON.stringify(teamDB));
-  }
+  useEffect(() => {
+    const roll = localStorage.getItem("currentUser");
+    const defaultUser = {name:"K.Hemalatha", roll:"254g1a3353", dept:"CSM", year:"2ND Year", college:"SRIT", email:"254g1a3353@srit.ac.in"};
+    const data = JSON.parse(localStorage.getItem(roll+"_data")) || defaultUser;
+    setUser(data);
+    if(!localStorage.getItem(roll+"_data")) localStorage.setItem(roll+"_data", JSON.stringify(defaultUser));
 
-  const completed = JSON.parse(localStorage.getItem(roll+"_completed")) || [];
-  setProjects(completed);
-  
-  const demoProjects = JSON.parse(localStorage.getItem("all_projects")) || [
-    {id:1, title:"AI Chatbot", desc:"Build AI chatbot for college", skills:"Python, NLP", limit:"5", duration:"2 Months"},
-    {id:2, title:"E-Commerce Website", desc:"MERN stack website", skills:"React, Node", limit:"4", duration:"3 Months"}
-  ];
-  setAllProjects(demoProjects);
-  
-  const notifs = JSON.parse(localStorage.getItem(roll+"_notifs")) || [];
-  setNotifications(notifs.length);
-},[])
+    const completed = JSON.parse(localStorage.getItem(roll+"_completed")) || [];
+    setProjects(completed);
+    
+    const demoProjects = JSON.parse(localStorage.getItem("all_projects")) || [
+      {id:1, title:"AI Chatbot", desc:"Build AI chatbot for college", skills:"Python, NLP", limit:"5", duration:"2 Months"},
+      {id:2, title:"E-Commerce Website", desc:"MERN stack website", skills:"React, Node", limit:"4", duration:"3 Months"}
+    ];
+    setAllProjects(demoProjects);
+    
+    const notifs = JSON.parse(localStorage.getItem(roll+"_notifs")) || [];
+    setNotifications(notifs.length);
+  },[])
 
   const handleApply = () => {
     if(!selectedProject || !whyJoin) return alert("Please fill all fields");
@@ -235,39 +226,30 @@ useEffect(() => {
               </div>
             </div>
           )}
-{page==="dashboard" && (
-  <div>
-    <h1 style={{color:"#A18CD1", fontSize:"32px"}}>Welcome {user.name}! 👋</h1>
-    
-    <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap:"25px", marginTop:"30px"}}>
-      <div className="stat-card" style={{background:"white", padding:"25px", borderRadius:"15px", boxShadow:"0 8px 25px rgba(161,140,209,0.1)", borderLeft:"5px solid #A18CD1"}}>
-        <h4 style={{color:"gray", fontSize:"14px"}}>Completed Projects</h4>
-        <p style={{fontSize:"36px", color:"#A18CD1", fontWeight:"bold"}}>{projects.length}</p>
-      </div>
-      <div className="stat-card" style={{background:"white", padding:"25px", borderRadius:"15px", boxShadow:"0 8px 25px rgba(161,140,209,0.1)", borderLeft:"5px solid #FF6B9D"}}>
-        <h4 style={{color:"gray", fontSize:"14px"}}>Pending Applications</h4>
-        <p style={{fontSize:"36px", color:"#FF6B9D", fontWeight:"bold"}}>0</p>
-      </div>
-    </div>
 
-    {/* TEAM MEMBERS SECTION */}
-    <h2 style={{color:"#A18CD1", fontSize:"28px", marginTop:"40px", marginBottom:"20px"}}>Our Team</h2>
-    <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(250px, 1fr))", gap:"25px"}}>
-      {JSON.parse(localStorage.getItem("team_db") || "[]").map(member => (
-        <div key={member.id} className="team-card jump-hover" style={{
-          background:"linear-gradient(135deg, #FF6B9D, #A18CD1)", 
-          padding:"25px", borderRadius:"15px", textAlign:"center", color:"white",
-          boxShadow:"0 8px 20px rgba(161,140,209,0.3)"
-        }}>
-          <div style={{fontSize:"50px"}}>{member.img}</div>
-          <h3 style={{margin:"10px 0 5px 0", fontSize:"22px"}}>{member.name}</h3>
-          <p style={{margin:"5px 0", fontSize:"14px"}}>Roll: {member.roll}</p>
-          <p style={{margin:"5px 0", fontSize:"14px"}}>Dept: {member.dept}</p>
-          <p style={{margin:"5px 0", fontSize:"15px", fontWeight:"600"}}>{member.role}</p>
-          <p style={{margin:"5px 0", fontSize:"14px"}}>{member.year}</p>
+          {page==="dashboard" && (
+            <div>
+              <h1 style={{color:"#A18CD1", fontSize:"32px"}}>Welcome {user.name}! 👋</h1>
+              <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap:"25px", marginTop:"30px"}}>
+                <div className="stat-card" style={{background:"white", padding:"25px", borderRadius:"15px", boxShadow:"0 8px 25px rgba(161,140,209,0.1)", borderLeft:"5px solid #A18CD1"}}>
+                  <h4 style={{color:"gray", fontSize:"14px"}}>Completed Projects</h4>
+                  <p style={{fontSize:"36px", color:"#A18CD1", fontWeight:"bold"}}>{projects.length}</p>
+                </div>
+                <div className="stat-card" style={{background:"white", padding:"25px", borderRadius:"15px", boxShadow:"0 8px 25px rgba(161,140,209,0.1)", borderLeft:"5px solid #FF6B9D"}}>
+                  <h4 style={{color:"gray", fontSize:"14px"}}>Pending Applications</h4>
+                  <p style={{fontSize:"36px", color:"#FF6B9D", fontWeight:"bold"}}>0</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {page!=="dashboard" && page!=="applyprojects" && page!=="createproject" && page!=="profile" && (
+            <div style={{background:"white", padding:"40px", borderRadius:"15px", textAlign:"center"}}>
+              <h1 style={{color:"#A18CD1"}}>{page} Page - Coming Soon</h1>
+            </div>
+          )}
         </div>
-      ))}
+      </div>
     </div>
-  </div>
-)
-}     
+  )
+}
