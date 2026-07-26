@@ -4,35 +4,65 @@ import { useRouter } from "next/router";
 export default function Dashboard() {
   const [page, setPage] = useState("dashboard");
   const [user, setUser] = useState({});
+  const [projects, setProjects] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [team, setTeam] = useState([]);
   const router = useRouter();
 
+  // TEAM DATABASE
+  const TEAM_DB = [
+    {id:1, name:"K.Hemalatha", roll:"254g1a3353", dept:"CSM", role:"Project Manager", year:"2ND Year", college:"SRIT", email:"254g1a3353@srit.ac.in"},
+    {id:2, name:"M.Hemalatha", roll:"254g1a3354", dept:"CSM", role:"Frontend Developer", year:"2ND Year", college:"SRIT", email:"254g1a3354@srit.ac.in"},
+    {id:3, name:"M.Jasmitha", roll:"254g1a3359", dept:"CSM", role:"Backend Developer", year:"2ND Year", college:"SRIT", email:"254g1a3359@srit.ac.in"}
+  ];
+
   useEffect(() => {
-    // Current user data
     const roll = localStorage.getItem("currentUser");
-    const defaultUser = {
-      name:"K.Hemalatha", 
-      roll:"254g1a3353", 
-      dept:"CSM", 
-      year:"2ND Year", 
-      college:"SRIT", 
-      email:"254g1a3353@srit.ac.in"
-    };
-    const data = JSON.parse(localStorage.getItem(roll+"_data")) || defaultUser;
-    setUser(data);
-    
-    // TEAM DB - 3 MEMBERS
-    const teamDB = [
-      {id:1, name:"K.Hemalatha", roll:"254G1A3353", dept:"CSM", role:"Project Manager", year:"2ND Year", email:"254g1a3353@srit.ac.in", img:"👩‍💼"},
-      {id:2, name:"M.Hemalatha", roll:"254G1A3354", dept:"CSM", role:"Frontend Developer", year:"2ND Year", email:"254g1a3354@srit.ac.in", img:"👩‍💻"},
-      {id:3, name:"M.Jasmitha", roll:"254G1A3359", dept:"CSM", role:"Backend Developer", year:"2ND Year", email:"254g1a3359@srit.ac.in", img:"👩‍💻"}
-    ];
-    if(!localStorage.getItem("team_db")) {
-      localStorage.setItem("team_db", JSON.stringify(teamDB));
-    }
-    setTeam(JSON.parse(localStorage.getItem("team_db")));
+    const userData = TEAM_DB.find(u => u.roll.toLowerCase() === roll?.toLowerCase()) || TEAM_DB[0];
+    setUser(userData);
+
+    // Load data from localStorage
+    setProjects(JSON.parse(localStorage.getItem("projects_db") || "[]"));
+    setApplications(JSON.parse(localStorage.getItem("applications_db") || "[]"));
+    setNotifications(JSON.parse(localStorage.getItem("notifications_db") || "[]"));
   },[])
+
+  // CREATE PROJECT
+  const [newProject, setNewProject] = useState({title:"", desc:"", skills:""});
+  const createProject = () => {
+    const project = {...newProject, id:Date.now(), createdBy:user.roll, status:"open"};
+    const updated = [...projects, project];
+    setProjects(updated);
+    localStorage.setItem("projects_db", JSON.stringify(updated));
+    setNewProject({title:"", desc:"", skills:""});
+    alert("Project Created!");
+  }
+
+  // APPLY PROJECT
+  const [applyData, setApplyData] = useState({projectId:"", reason:""});
+  const applyProject = () => {
+    const app = {...applyData, id:Date.now(), studentRoll:user.roll, studentName:user.name, status:"pending"};
+    const updated = [...applications, app];
+    setApplications(updated);
+    localStorage.setItem("applications_db", JSON.stringify(updated));
+    setApplyData({projectId:"", reason:""});
+    alert("Applied Successfully!");
+  }
+
+  // GENERATE CERTIFICATE
+  const generateCertificate = () => {
+    const cert = `------------------------------------
+        SRIT MI PORTAL - CERTIFICATE
+
+This is to certify that
+${user.name}
+Roll No: ${user.roll}
+has successfully completed the project.
+Date: ${new Date().toLocaleDateString()}
+------------------------------------`;
+    alert(cert);
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
@@ -40,209 +70,219 @@ export default function Dashboard() {
   }
 
   const menuItems = [
-    {id:"dashboard", name:"📊 Dashboard"},
-    {id:"profile", name:"👤 Profile"},
-    {id:"team", name:"👥 Team Members"},
-    {id:"projects", name:"💼 Projects"},
-    {id:"apply", name:"📝 Apply Project"},
+    {id:"profile", name:"Profile"},
+    {id:"dashboard", name:"Dashboard"},
+    {id:"projects", name:"Projects"},
+    {id:"apply", name:"Apply Project"},
+    {id:"create", name:"+ Create Project"},
+    {id:"review", name:"Review Applications"},
+    {id:"notifications", name:"🔔 Notifications"},
+    {id:"certificate", name:"🏆 My Certificates"},
   ]
+
+  const myProjects = projects.filter(p => p.createdBy === user.roll).length;
+  const myApplications = applications.filter(a => a.studentRoll === user.roll).length;
 
   return (
     <div>
       <style>{`
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: Arial, sans-serif; background:#f5f5f5; }
-        
-        .header { 
-          background:#4A90E2; 
-          color:white; 
-          padding:15px 20px; 
-          display:flex; 
-          justify-content:space-between; 
-          align-items:center; 
-          position:sticky; 
-          top:0; 
-          z-index:100;
-          box-shadow:0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .sidebar { 
-          width:240px; 
-          background:white; 
-          height:calc(100vh - 60px); 
-          position:fixed; 
-          padding:20px; 
-          box-shadow:2px 0 5px rgba(0,0,0,0.1);
+        * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+        body { background:#f0f0f0; }
+
+       .container { display:flex; min-height:100vh; }
+
+       .sidebar {
+          width:280px;
+          background: linear-gradient(180deg, #FF6B9D 0%, #A18CD1 100%);
+          color:white;
+          padding:20px;
+          position:fixed;
+          height:100vh;
           overflow-y:auto;
         }
-        
-        .sidebar-btn { 
-          width:100%; 
-          padding:12px 15px; 
-          margin:5px 0; 
-          border:none; 
-          background:none; 
-          text-align:left; 
-          cursor:pointer; 
-          font-size:15px; 
-          border-radius:5px;
-          transition:0.2s;
+
+       .logo { font-size:22px; font-weight:bold; margin-bottom:30px; text-align:center; }
+
+       .sidebar-btn {
+          width:100%;
+          padding:14px 15px;
+          margin:8px 0;
+          border:none;
+          background:transparent;
+          color:white;
+          text-align:left;
+          cursor:pointer;
+          font-size:15px;
+          border-radius:10px;
+          transition:0.3s;
         }
-        
-        .sidebar-btn:hover { background:#E3F2FD; }
-        .sidebar-btn.active { background:#4A90E2; color:white; font-weight:bold; }
-        
-        .main { margin-left:260px; padding:30px; }
-        
-        .card { 
-          background:white; 
-          padding:25px; 
-          border-radius:8px; 
-          margin-bottom:20px; 
-          box-shadow:0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .team-grid { 
-          display:grid; 
-          grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); 
-          gap:20px; 
-        }
-        
-        .team-card { 
-          background:white; 
-          padding:25px; 
-          border-radius:8px; 
-          text-align:center; 
-          box-shadow:0 2px 8px rgba(0,0,0,0.1);
-          border-top:4px solid #4A90E2;
-        }
-        
-        .logout-btn {
-          width:100%; 
-          padding:12px; 
-          margin-top:20px; 
-          background:#f44336; 
-          color:white; 
-          border:none; 
-          border-radius:5px; 
+
+       .sidebar-btn:hover { background:rgba(255,255,255,0.2); }
+       .sidebar-btn.active { background:white; color:#A18CD1; font-weight:bold; }
+
+       .logout-btn {
+          width:100%;
+          padding:14px;
+          margin-top:20px;
+          background:#ff4444;
+          color:white;
+          border:none;
+          border-radius:10px;
           cursor:pointer;
           font-size:15px;
           font-weight:bold;
         }
-        
-        .logout-btn:hover { background:#d32f2f; }
-        
-        .hamburger { 
-          display:none; 
-          font-size:24px; 
-          background:none; 
-          border:none; 
-          color:white; 
-          cursor:pointer; 
+
+       .main { margin-left:280px; padding:30px; flex:1; }
+
+       .welcome { font-size:28px; font-weight:bold; color:#8B2D6B; margin-bottom:20px; }
+
+       .stats-card {
+          background:white;
+          padding:20px;
+          border-radius:15px;
+          display:inline-block;
+          box-shadow:0 4px 10px rgba(0,0,0,0.1);
         }
-        
+
+       .card {
+          background:white;
+          padding:25px;
+          border-radius:15px;
+          margin-bottom:20px;
+          box-shadow:0 4px 10px rgba(0,0,0,0.1);
+        }
+
+       .input { width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px; }
+       .btn { padding:12px 25px; background:#A18CD1; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
+       .btn:hover { background:#8B7AC6; }
+
+       .project-item { border:1px solid #ddd; padding:15px; border-radius:10px; margin:10px 0; }
+
+       .hamburger { display:none; position:fixed; top:15px; right:15px; z-index:999; background:#A18CD1; color:white; border:none; padding:10px 15px; border-radius:5px; }
+
         @media (max-width: 768px) {
-          .sidebar { 
-            display: ${menuOpen ? 'block' : 'none'}; 
-            width:100%; 
-            height:auto; 
-            position:relative;
-          }
-          .main { margin-left:0; padding:15px; }
-          .hamburger { display:block; }
+         .sidebar { display: ${menuOpen? 'block' : 'none'}; width:100%; position:relative; height:auto; }
+         .main { margin-left:0; padding:15px; }
+         .hamburger { display:block; }
         }
       `}</style>
 
-      {/* HEADER */}
-      <div className="header">
-        <h3>🎓 SRIT MI Portal</h3>
-        <button className="hamburger" onClick={()=>setMenuOpen(!menuOpen)}>☰</button>
-      </div>
+      <button className="hamburger" onClick={()=>setMenuOpen(!menuOpen)}>☰</button>
 
-      <div style={{display:"flex"}}>
+      <div className="container">
         {/* SIDEBAR */}
         <div className="sidebar">
+          <div className="logo">🎓 SRIT MI Portal</div>
           {menuItems.map(item => (
-            <button 
-              key={item.id} 
-              onClick={()=>{setPage(item.id); setMenuOpen(false)}} 
+            <button
+              key={item.id}
+              onClick={()=>{setPage(item.id); setMenuOpen(false)}}
               className={`sidebar-btn ${page===item.id?"active":""}`}
             >
               {item.name}
             </button>
           ))}
-          <button onClick={handleLogout} className="logout-btn">
-            🚪 Logout
-          </button>
+          <button onClick={handleLogout} className="logout-btn">Logout</button>
         </div>
 
-        {/* MAIN CONTENT */}
+        {/* MAIN */}
         <div className="main">
-          
-          {/* DASHBOARD PAGE */}
-          {page==="dashboard" && (
-            <div>
-              <h1 style={{marginBottom:"20px", color:"#333"}}>Welcome, {user.name}!</h1>
-              <div className="card">
-                <h3 style={{color:"#4A90E2", marginBottom:"15px"}}>Dashboard Overview</h3>
-                <p style={{margin:"10px 0"}}><b>Roll No:</b> {user.roll}</p>
-                <p style={{margin:"10px 0"}}><b>Department:</b> {user.dept}</p>
-                <p style={{margin:"10px 0"}}><b>Year:</b> {user.year}</p>
-                <p style={{margin:"10px 0"}}><b>College:</b> {user.college}</p>
-              </div>
-            </div>
-          )}
 
-          {/* PROFILE PAGE */}
+          {/* PROFILE */}
           {page==="profile" && (
             <div className="card">
-              <h2 style={{color:"#4A90E2", marginBottom:"20px"}}>My Profile</h2>
-              <div style={{lineHeight:"2"}}>
-                <p><b>Name:</b> {user.name}</p>
-                <p><b>Roll No:</b> {user.roll}</p>
-                <p><b>Department:</b> {user.dept}</p>
-                <p><b>Year:</b> {user.year}</p>
-                <p><b>College:</b> {user.college}</p>
-                <p><b>Email:</b> {user.email}</p>
-              </div>
+              <h2 style={{color:"#A18CD1", marginBottom:"20px"}}>My Profile</h2>
+              <p><b>Name:</b> {user.name}</p>
+              <p><b>Roll No:</b> {user.roll}</p>
+              <p><b>Role:</b> {user.role}</p>
+              <p><b>Department:</b> {user.dept}</p>
+              <p><b>Year:</b> {user.year}</p>
+              <p><b>Email:</b> {user.email}</p>
             </div>
           )}
 
-          {/* TEAM PAGE */}
-          {page==="team" && (
+          {/* DASHBOARD */}
+          {page==="dashboard" && (
             <div>
-              <h2 style={{color:"#4A90E2", marginBottom:"20px"}}>Our Team Members</h2>
-              <div className="team-grid">
-                {team.map(member => (
-                  <div key={member.id} className="team-card">
-                    <div style={{fontSize:"60px", marginBottom:"15px"}}>{member.img}</div>
-                    <h3 style={{color:"#333", marginBottom:"10px"}}>{member.name}</h3>
-                    <p style={{margin:"8px 0"}}><b>Roll:</b> {member.roll}</p>
-                    <p style={{margin:"8px 0"}}><b>Role:</b> {member.role}</p>
-                    <p style={{margin:"8px 0"}}><b>Dept:</b> {member.dept}</p>
-                    <p style={{margin:"8px 0"}}><b>Year:</b> {member.year}</p>
-                    <p style={{margin:"8px 0", fontSize:"14px", color:"#666"}}>{member.email}</p>
-                  </div>
-                ))}
+              <div className="welcome">Welcome {user.name} 👋</div>
+              <div className="stats-card">
+                <div style={{fontSize:"18px", fontWeight:"bold"}}>Projects {myProjects}</div>
+                <div style={{fontSize:"18px", fontWeight:"bold"}}>| Applications {myApplications}</div>
               </div>
             </div>
           )}
 
-          {/* PROJECTS PAGE */}
+          {/* PROJECTS */}
           {page==="projects" && (
             <div className="card">
-              <h2 style={{color:"#4A90E2", marginBottom:"20px"}}>My Projects</h2>
-              <p>No projects assigned yet.</p>
-              <p style={{marginTop:"10px", color:"#666"}}>Apply for a project to get started!</p>
+              <h2 style={{color:"#A18CD1"}}>All Projects</h2>
+              {projects.length===0? <p>No projects yet</p> :
+                projects.map(p => (
+                  <div key={p.id} className="project-item">
+                    <h3>{p.title}</h3>
+                    <p>{p.desc}</p>
+                    <p><b>Skills:</b> {p.skills}</p>
+                  </div>
+                ))
+              }
             </div>
           )}
 
-          {/* APPLY PAGE */}
+          {/* CREATE PROJECT */}
+          {page==="create" && (
+            <div className="card">
+              <h2 style={{color:"#A18CD1"}}>Create New Project</h2>
+              <input className="input" placeholder="Project Title" value={newProject.title} onChange={e=>setNewProject({...newProject, title:e.target.value})} />
+              <textarea className="input" placeholder="Description" rows="4" value={newProject.desc} onChange={e=>setNewProject({...newProject, desc:e.target.value})} />
+              <input className="input" placeholder="Required Skills" value={newProject.skills} onChange={e=>setNewProject({...newProject, skills:e.target.value})} />
+              <button className="btn" onClick={createProject}>Create Project</button>
+            </div>
+          )}
+
+          {/* APPLY PROJECT */}
           {page==="apply" && (
             <div className="card">
-              <h2 style={{color:"#4A90E2", marginBottom:"20px"}}>Apply for Project</h2>
-              <p>Project application form will be available soon.</p>
-              <p style={{marginTop:"10px", color:"#666"}}>Stay tuned!</p>
+              <h2 style={{color:"#A18CD1"}}>Apply for Project</h2>
+              <select className="input" value={applyData.projectId} onChange={e=>setApplyData({...applyData, projectId:e.target.value})}>
+                <option value="">Select Project</option>
+                {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+              </select>
+              <textarea className="input" placeholder="Why do you want this project?" rows="4" value={applyData.reason} onChange={e=>setApplyData({...applyData, reason:e.target.value})} />
+              <button className="btn" onClick={applyProject}>Apply Now</button>
+            </div>
+          )}
+
+          {/* REVIEW APPLICATIONS */}
+          {page==="review" && (
+            <div className="card">
+              <h2 style={{color:"#A18CD1"}}>Review Applications</h2>
+              {applications.filter(a => projects.find(p=>p.id==a.projectId)?.createdBy === user.roll).length===0?
+                <p>No applications yet</p> :
+                applications.filter(a => projects.find(p=>p.id==a.projectId)?.createdBy === user.roll).map(a => (
+                  <div key={a.id} className="project-item">
+                    <p><b>Student:</b> {a.studentName} - {a.studentRoll}</p>
+                    <p><b>Project:</b> {projects.find(p=>p.id==a.projectId)?.title}</p>
+                    <p><b>Status:</b> {a.status}</p>
+                  </div>
+                ))
+              }
+            </div>
+          )}
+
+          {/* NOTIFICATIONS */}
+          {page==="notifications" && (
+            <div className="card">
+              <h2 style={{color:"#A18CD1"}}>Notifications</h2>
+              <p>No new notifications</p>
+            </div>
+          )}
+
+          {/* CERTIFICATES */}
+          {page==="certificate" && (
+            <div className="card">
+              <h2 style={{color:"#A18CD1"}}>My Certificates</h2>
+              <button className="btn" onClick={generateCertificate}>Generate Certificate</button>
             </div>
           )}
 
