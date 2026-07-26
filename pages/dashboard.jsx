@@ -6,6 +6,7 @@ export default function Dashboard() {
   const [user, setUser] = useState({});
   const [projects, setProjects] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
 
@@ -22,11 +23,13 @@ export default function Dashboard() {
     setUser(userData);
     setProjects(JSON.parse(localStorage.getItem("projects_db") || "[]"));
     setApplications(JSON.parse(localStorage.getItem("applications_db") || "[]"));
+    setNotifications(JSON.parse(localStorage.getItem("notifications_db") || "[]"));
   },[])
 
   // CREATE PROJECT WITH STUDENT DETAILS
   const [newProject, setNewProject] = useState({title:"", desc:"", skills:"", teamSize:""});
   const createProject = () => {
+    if(!newProject.title ||!newProject.desc) return alert("Please fill all fields");
     const project = {
      ...newProject,
       id:Date.now(),
@@ -34,8 +37,10 @@ export default function Dashboard() {
       createdByName:user.name,
       createdByEmail:user.email,
       createdByPhone:user.phone,
+      createdByDept:user.dept,
       status:"open",
-      completed:false
+      completed:false,
+      createdAt: new Date().toLocaleDateString()
     };
     const updated = [...projects, project];
     setProjects(updated);
@@ -47,6 +52,7 @@ export default function Dashboard() {
   // APPLY PROJECT WITH STUDENT DETAILS
   const [applyData, setApplyData] = useState({projectId:"", reason:""});
   const applyProject = () => {
+    if(!applyData.projectId) return alert("Please select a project");
     const app = {
      ...applyData,
       id:Date.now(),
@@ -55,7 +61,9 @@ export default function Dashboard() {
       studentEmail:user.email,
       studentPhone:user.phone,
       studentDept:user.dept,
-      status:"pending"
+      studentYear:user.year,
+      status:"pending",
+      appliedAt: new Date().toLocaleDateString()
     };
     const updated = [...applications, app];
     setApplications(updated);
@@ -67,32 +75,43 @@ export default function Dashboard() {
   // CERTIFICATE FORM
   const [certData, setCertData] = useState({projectId:"", duration:"", description:""});
   const generateCertificate = () => {
+    if(!certData.projectId) return alert("Select a project first");
     const project = projects.find(p => p.id == certData.projectId);
-    if(!project) return alert("Select a project first");
+    if(!project) return alert("Project not found");
 
     const certContent = `
-SRIT MI PORTAL - CERTIFICATE OF COMPLETION
+
+      SRIT MI PORTAL
+   CERTIFICATE OF COMPLETION
+
 
 This is to certify that
-${user.name}
+
+Name: ${user.name}
 Roll No: ${user.roll}
 Department: ${user.dept}
+Year: ${user.year}
+Email: ${user.email}
 
 has successfully completed the project:
-"${project.title}"
 
+Project Title: ${project.title}
 Project Description: ${project.desc}
+Skills Used: ${project.skills}
 Duration: ${certData.duration}
-Skills: ${project.skills}
+Completion Date: ${new Date().toLocaleDateString()}
 
-Date: ${new Date().toLocaleDateString()}
+Project Created By: ${project.createdByName}
+
+    "Building Skills, Building Future"
+
     `;
 
     const blob = new Blob([certContent], {type: 'text/plain'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Certificate_${user.roll}_${project.title}.txt`;
+    a.download = `Certificate_${user.roll}_${project.title.replace(/ /g,"_")}.txt`;
     a.click();
     alert("🎉 Certificate Downloaded Successfully!");
   }
@@ -103,29 +122,31 @@ Date: ${new Date().toLocaleDateString()}
   }
 
   const menuItems = [
-    {id:"profile", name:"Profile"},
-    {id:"dashboard", name:"Dashboard"},
-    {id:"projects", name:"Projects"},
-    {id:"apply", name:"Apply Project"},
-    {id:"create", name:"+ Create Project"},
-    {id:"review", name:"Review Applications"},
+    {id:"profile", name:"👤 Profile"},
+    {id:"dashboard", name:"📊 Dashboard"},
+    {id:"projects", name:"💼 Projects"},
+    {id:"apply", name:"📝 Apply Project"},
+    {id:"create", name:"✨ Create Project"},
+    {id:"review", name:"📋 Review Applications"},
     {id:"notifications", name:"🔔 Notifications"},
     {id:"certificate", name:"🏆 My Certificates"},
   ]
 
   const myProjects = projects.filter(p => p.createdBy === user.roll).length;
   const myApplications = applications.filter(a => a.studentRoll === user.roll).length;
+  const myReviews = applications.filter(a => projects.find(p=>p.id==a.projectId)?.createdBy === user.roll).length;
 
   return (
     <div>
       <style>{`
         * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
-        body { background:#f0f0f0; }
+        body { background:#f0f0f0; overflow-x:hidden; }
 
-        @keyframes jump { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-       .jump { animation: jump 0.6s ease; }
+        @keyframes jump { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+       .jump { animation: jump 0.5s ease; }
 
        .container { display:flex; min-height:100vh; }
+
        .sidebar {
           width:280px;
           background: linear-gradient(180deg, #FF6B9D 0%, #A18CD1 100%);
@@ -134,8 +155,12 @@ Date: ${new Date().toLocaleDateString()}
           position:fixed;
           height:100vh;
           overflow-y:auto;
+          transition:0.3s;
+          z-index:998;
         }
+
        .logo { font-size:22px; font-weight:bold; margin-bottom:30px; text-align:center; }
+
        .sidebar-btn {
           width:100%;
           padding:14px 15px;
@@ -149,8 +174,10 @@ Date: ${new Date().toLocaleDateString()}
           border-radius:10px;
           transition:0.3s;
         }
-       .sidebar-btn:hover { background:rgba(255,255,255,0.2); }
+
+       .sidebar-btn:hover { background:rgba(255,255,255,0.2); transform:translateX(5px); }
        .sidebar-btn.active { background:white; color:#A18CD1; font-weight:bold; }
+
        .logout-btn {
           width:100%;
           padding:14px;
@@ -162,16 +189,25 @@ Date: ${new Date().toLocaleDateString()}
           cursor:pointer;
           font-size:15px;
           font-weight:bold;
+          transition:0.3s;
         }
-       .main { margin-left:280px; padding:30px; flex:1; }
+       .logout-btn:hover { background:#d32f2f; }
+
+       .main { margin-left:280px; padding:30px; flex:1; transition:0.3s; }
+
        .welcome { font-size:28px; font-weight:bold; color:#8B2D6B; margin-bottom:20px; }
+
+       .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:20px; }
+
        .stats-card {
           background:white;
           padding:20px;
           border-radius:15px;
-          display:inline-block;
           box-shadow:0 4px 10px rgba(0,0,0,0.1);
+          text-align:center;
+          border-left:4px solid #A18CD1;
         }
+
        .card {
           background:white;
           padding:25px;
@@ -179,16 +215,33 @@ Date: ${new Date().toLocaleDateString()}
           margin-bottom:20px;
           box-shadow:0 4px 10px rgba(0,0,0,0.1);
         }
-       .input { width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px; }
-       .btn { padding:12px 25px; background:#A18CD1; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
-       .btn:hover { background:#8B7AC6; }
-       .project-item { border:1px solid #ddd; padding:15px; border-radius:10px; margin:10px 0; }
-       .hamburger { display:none; position:fixed; top:15px; right:15px; z-index:999; background:#A18CD1; color:white; border:none; padding:10px 15px; border-radius:5px; }
 
-        @media (max-width: 768px) {
-         .sidebar { display: ${menuOpen? 'block' : 'none'}; width:100%; position:relative; height:auto; }
-         .main { margin-left:0; padding:15px; }
+       .input { width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px; font-size:16px; }
+       .input:focus { outline:none; border-color:#A18CD1; }
+
+       .btn { padding:12px 25px; background:#A18CD1; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px; transition:0.3s; }
+       .btn:hover { background:#8B7AC6; transform:translateY(-2px); }
+       .btn-full { width:100%; }
+
+       .project-item { border:1px solid #ddd; padding:15px; border-radius:10px; margin:10px 0; background:#fafafa; }
+       .project-item:hover { box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+
+       .info-box { background:#f5f5f5; padding:15px; border-radius:8px; margin:10px 0; border-left:3px solid #A18CD1; }
+
+       .hamburger { display:none; position:fixed; top:15px; right:15px; z-index:999; background:#A18CD1; color:white; border:none; padding:10px 15px; border-radius:8px; font-size:22px; cursor:pointer; }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 1023px) {
+         .sidebar { transform: translateX(-100%); }
+         .sidebar.open { transform: translateX(0); box-shadow:2px 0 10px rgba(0,0,0,0.3); }
+         .main { margin-left:0; padding:20px 15px; }
          .hamburger { display:block; }
+         .welcome { font-size:22px; }
+         .stats-grid { grid-template-columns:1fr; }
+        }
+
+        @media (min-width: 768px) {
+         .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
         }
       `}</style>
 
@@ -196,7 +249,7 @@ Date: ${new Date().toLocaleDateString()}
 
       <div className="container">
         {/* SIDEBAR */}
-        <div className="sidebar">
+        <div className={`sidebar ${menuOpen? 'open' : ''}`}>
           <div className="logo jump">🎓 SRIT MI Portal</div>
           {menuItems.map(item => (
             <button
@@ -207,7 +260,7 @@ Date: ${new Date().toLocaleDateString()}
               {item.name}
             </button>
           ))}
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
+          <button onClick={handleLogout} className="logout-btn">🚪 Logout</button>
         </div>
 
         {/* MAIN */}
@@ -217,13 +270,16 @@ Date: ${new Date().toLocaleDateString()}
           {page==="profile" && (
             <div className="card jump">
               <h2 style={{color:"#A18CD1", marginBottom:"20px"}}>My Profile</h2>
-              <p><b>Name:</b> {user.name}</p>
-              <p><b>Roll No:</b> {user.roll}</p>
-              <p><b>Role:</b> {user.role}</p>
-              <p><b>Department:</b> {user.dept}</p>
-              <p><b>Year:</b> {user.year}</p>
-              <p><b>Email:</b> {user.email}</p>
-              <p><b>Phone:</b> {user.phone}</p>
+              <div className="grid-2">
+                <p><b>Name:</b> {user.name}</p>
+                <p><b>Roll No:</b> {user.roll}</p>
+                <p><b>Role:</b> {user.role}</p>
+                <p><b>Department:</b> {user.dept}</p>
+                <p><b>Year:</b> {user.year}</p>
+                <p><b>College:</b> {user.college}</p>
+                <p><b>Email:</b> {user.email}</p>
+                <p><b>Phone:</b> {user.phone}</p>
+              </div>
             </div>
           )}
 
@@ -231,9 +287,19 @@ Date: ${new Date().toLocaleDateString()}
           {page==="dashboard" && (
             <div className="jump">
               <div className="welcome">Welcome {user.name} 👋</div>
-              <div className="stats-card">
-                <div style={{fontSize:"18px", fontWeight:"bold"}}>Projects {myProjects}</div>
-                <div style={{fontSize:"18px", fontWeight:"bold"}}>| Applications {myApplications}</div>
+              <div className="stats-grid">
+                <div className="stats-card">
+                  <h3 style={{color:"#A18CD1"}}>{myProjects}</h3>
+                  <p>Projects Created</p>
+                </div>
+                <div className="stats-card">
+                  <h3 style={{color:"#A18CD1"}}>{myApplications}</h3>
+                  <p>Applications Sent</p>
+                </div>
+                <div className="stats-card">
+                  <h3 style={{color:"#A18CD1"}}>{myReviews}</h3>
+                  <p>Applications Received</p>
+                </div>
               </div>
             </div>
           )}
@@ -241,15 +307,17 @@ Date: ${new Date().toLocaleDateString()}
           {/* PROJECTS */}
           {page==="projects" && (
             <div className="card jump">
-              <h2 style={{color:"#A18CD1"}}>All Projects</h2>
-              {projects.length===0? <p>No projects yet</p> :
+              <h2 style={{color:"#A18CD1", marginBottom:"20px"}}>All Projects</h2>
+              {projects.length===0? <p>No projects yet. Create one!</p> :
                 projects.map(p => (
                   <div key={p.id} className="project-item">
-                    <h3>{p.title}</h3>
+                    <h3 style={{color:"#8B2D6B"}}>{p.title}</h3>
                     <p>{p.desc}</p>
                     <p><b>Skills:</b> {p.skills}</p>
+                    <p><b>Team Size:</b> {p.teamSize}</p>
                     <p><b>Created By:</b> {p.createdByName} - {p.createdBy}</p>
                     <p><b>Contact:</b> {p.createdByEmail}</p>
+                    <p><b>Status:</b> {p.completed? "Completed" : "Open"}</p>
                   </div>
                 ))
               }
@@ -259,60 +327,57 @@ Date: ${new Date().toLocaleDateString()}
           {/* CREATE PROJECT */}
           {page==="create" && (
             <div className="card jump">
-              <h2 style={{color:"#A18CD1"}}>Create New Project ✨</h2>
+              <h2 style={{color:"#A18CD1", marginBottom:"20px"}}>Create New Project ✨</h2>
               <input className="input" placeholder="Project Title" value={newProject.title} onChange={e=>setNewProject({...newProject, title:e.target.value})} />
-              <textarea className="input" placeholder="Description" rows="4" value={newProject.desc} onChange={e=>setNewProject({...newProject, desc:e.target.value})} />
+              <textarea className="input" placeholder="Project Description" rows="4" value={newProject.desc} onChange={e=>setNewProject({...newProject, desc:e.target.value})} />
               <input className="input" placeholder="Required Skills" value={newProject.skills} onChange={e=>setNewProject({...newProject, skills:e.target.value})} />
               <input className="input" placeholder="Team Size Needed" value={newProject.teamSize} onChange={e=>setNewProject({...newProject, teamSize:e.target.value})} />
 
-              <div style={{background:"#f5f5f5", padding:"15px", borderRadius:"8px", margin:"10px 0"}}>
+              <div className="info-box">
                 <h4>Your Details:</h4>
-                <p><b>Name:</b> {user.name}</p>
-                <p><b>Roll:</b> {user.roll}</p>
-                <p><b>Email:</b> {user.email}</p>
-                <p><b>Phone:</b> {user.phone}</p>
+                <p><b>Name:</b> {user.name} | <b>Roll:</b> {user.roll}</p>
+                <p><b>Email:</b> {user.email} | <b>Phone:</b> {user.phone}</p>
               </div>
-              <button className="btn" onClick={createProject}>Create Project</button>
+              <button className="btn btn-full" onClick={createProject}>Create Project</button>
             </div>
           )}
 
           {/* APPLY PROJECT */}
           {page==="apply" && (
             <div className="card jump">
-              <h2 style={{color:"#A18CD1"}}>Apply for Project 📝</h2>
+              <h2 style={{color:"#A18CD1", marginBottom:"20px"}}>Apply for Project 📝</h2>
               <select className="input" value={applyData.projectId} onChange={e=>setApplyData({...applyData, projectId:e.target.value})}>
                 <option value="">Select Project</option>
-                {projects.filter(p=>!p.completed).map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                {projects.filter(p=>!p.completed).map(p => <option key={p.id} value={p.id}>{p.title} - By {p.createdByName}</option>)}
               </select>
               <textarea className="input" placeholder="Why do you want this project?" rows="4" value={applyData.reason} onChange={e=>setApplyData({...applyData, reason:e.target.value})} />
 
-              <div style={{background:"#f5f5f5", padding:"15px", borderRadius:"8px", margin:"10px 0"}}>
+              <div className="info-box">
                 <h4>Your Details will be sent:</h4>
-                <p><b>Name:</b> {user.name}</p>
-                <p><b>Roll:</b> {user.roll}</p>
-                <p><b>Dept:</b> {user.dept}</p>
-                <p><b>Email:</b> {user.email}</p>
-                <p><b>Phone:</b> {user.phone}</p>
+                <p><b>Name:</b> {user.name} | <b>Roll:</b> {user.roll}</p>
+                <p><b>Dept:</b> {user.dept} | <b>Year:</b> {user.year}</p>
+                <p><b>Email:</b> {user.email} | <b>Phone:</b> {user.phone}</p>
               </div>
-              <button className="btn" onClick={applyProject}>Apply Now</button>
+              <button className="btn btn-full" onClick={applyProject}>Apply Now</button>
             </div>
           )}
 
           {/* REVIEW APPLICATIONS */}
           {page==="review" && (
             <div className="card jump">
-              <h2 style={{color:"#A18CD1"}}>Review Applications</h2>
+              <h2 style={{color:"#A18CD1", marginBottom:"20px"}}>Review Applications</h2>
               {applications.filter(a => projects.find(p=>p.id==a.projectId)?.createdBy === user.roll).length===0?
                 <p>No applications yet</p> :
                 applications.filter(a => projects.find(p=>p.id==a.projectId)?.createdBy === user.roll).map(a => (
                   <div key={a.id} className="project-item">
+                    <h3>{projects.find(p=>p.id==a.projectId)?.title}</h3>
                     <p><b>Student:</b> {a.studentName} - {a.studentRoll}</p>
-                    <p><b>Dept:</b> {a.studentDept}</p>
+                    <p><b>Dept:</b> {a.studentDept} | <b>Year:</b> {a.studentYear}</p>
                     <p><b>Email:</b> {a.studentEmail}</p>
                     <p><b>Phone:</b> {a.studentPhone}</p>
-                    <p><b>Project:</b> {projects.find(p=>p.id==a.projectId)?.title}</p>
                     <p><b>Reason:</b> {a.reason}</p>
                     <p><b>Status:</b> {a.status}</p>
+                    <p><b>Applied On:</b> {a.appliedAt}</p>
                   </div>
                 ))
               }
@@ -322,7 +387,7 @@ Date: ${new Date().toLocaleDateString()}
           {/* NOTIFICATIONS */}
           {page==="notifications" && (
             <div className="card jump">
-              <h2 style={{color:"#A18CD1"}}>Notifications 🔔</h2>
+              <h2 style={{color:"#A18CD1", marginBottom:"20px"}}>Notifications 🔔</h2>
               <p>No new notifications</p>
             </div>
           )}
@@ -330,14 +395,14 @@ Date: ${new Date().toLocaleDateString()}
           {/* CERTIFICATES */}
           {page==="certificate" && (
             <div className="card jump">
-              <h2 style={{color:"#A18CD1"}}>Generate Certificate 🏆</h2>
+              <h2 style={{color:"#A18CD1", marginBottom:"20px"}}>Generate Certificate 🏆</h2>
               <select className="input" value={certData.projectId} onChange={e=>setCertData({...certData, projectId:e.target.value})}>
                 <option value="">Select Completed Project</option>
                 {projects.filter(p=>p.createdBy===user.roll).map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
               </select>
               <input className="input" placeholder="Project Duration" value={certData.duration} onChange={e=>setCertData({...certData, duration:e.target.value})} />
               <textarea className="input" placeholder="Project Description" rows="3" value={certData.description} onChange={e=>setCertData({...certData, description:e.target.value})} />
-              <button className="btn" onClick={generateCertificate}>Generate & Download Certificate</button>
+              <button className="btn btn-full" onClick={generateCertificate}>Generate & Download Certificate</button>
             </div>
           )}
 
