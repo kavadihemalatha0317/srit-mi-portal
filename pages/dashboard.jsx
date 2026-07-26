@@ -6,13 +6,13 @@ import { getDatabase, ref, set, onValue, push, update } from 'firebase/database'
 // ==================== FIREBASE CONFIG ====================
 // SCREENSHOT NUNCHI COPY CHEYI BROO
 const firebaseConfig = {
-  apiKey: "PASTE_YOUR_APIKEY_HERE",
+  apiKey: "AIzaSyDra1qwWqvST3DoCKUCrfjw6jYAR6W35gg",
   authDomain: "srit-mini-internship.firebaseapp.com",
   databaseURL: "https://srit-mini-internship-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "srit-mini-internship",
-  storageBucket: "srit-mini-internship.appspot.com",
-  messagingSenderId: "PASTE_YOUR_SENDERID_HERE",
-  appId: "PASTE_YOUR_APPID_HERE"
+  storageBucket: "srit-mini-internship.firebasestorage.app",
+  messagingSenderId: "301325399899",
+  appId: "1:301325399899:web:3791ba62f63f4061930c7e"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
