@@ -79,7 +79,7 @@ export default function App() {
             Build Projects. Gain Experience. Get Certified
           </h1>
           <p style={{fontSize:"20px", color:"#666", maxWidth:"700px", margin:"0 auto"}}>
-            SRIT lo students kosam projects chesi, skills penchukoni, certificates sampadinche platform
+            A platform for SRIT students to work on projects,enhance skills, and earn certificates.
           </p>
         </div>
 
