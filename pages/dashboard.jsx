@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set, onValue, push, update } from 'firebase/database';
 
+// ==================== FIREBASE CONFIG ====================
 const firebaseConfig = {
   apiKey: "AIzaSyDra1qwWqvST3DoCKUCrfjw6jYAR6W35gg",
   authDomain: "srit-mini-internship.firebaseapp.com",
@@ -12,7 +13,6 @@ const firebaseConfig = {
   messagingSenderId: "301325399899",
   appId: "1:301325399899:web:3791ba62f63f4061930c7e"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
@@ -103,12 +103,12 @@ export default function Dashboard() {
         <style>
           *{margin:0; padding:0; box-sizing:border-box;}
           body { font-family: 'Arial'; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:20px; min-height:100vh; display:flex; align-items:center; justify-content:center; }
-     .border { background: linear-gradient(45deg, #FF6B9D, #A18CD1, #FFD700); padding:8px; border-radius:25px; width:100%; max-width:900px; }
-     .cert { background:white; border-radius:20px; padding:30px 20px; text-align:center; position:relative; }
-     .cert:before { content:''; position:absolute; top:15px; left:15px; right:15px; bottom:15px; border:3px dashed #A18CD1; border-radius:15px; }
+    .border { background: linear-gradient(45deg, #FF6B9D, #A18CD1, #FFD700); padding:8px; border-radius:25px; width:100%; max-width:900px; }
+    .cert { background:white; border-radius:20px; padding:30px 20px; text-align:center; position:relative; }
+    .cert:before { content:''; position:absolute; top:15px; left:15px; right:15px; bottom:15px; border:3px dashed #A18CD1; border-radius:15px; }
           h1 { color:#A18CD1; font-size:clamp(24px, 5vw, 42px); margin-bottom:15px; }
           h2 { color:#FF6B9D; font-size:clamp(18px, 4vw, 32px); margin:15px 0; }
-      .seal { font-size:clamp(40px, 8vw, 60px); margin:15px; }
+     .seal { font-size:clamp(40px, 8vw, 60px); margin:15px; }
          p { font-size:clamp(12px, 2.5vw, 16px); }
           @media print { body { background:white; padding:0; }.border { padding:5px; } }
         </style>
@@ -137,7 +137,8 @@ export default function Dashboard() {
         body { font-family: 'Poppins'; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; }
  .toast { position:fixed; top:20px; right:20px; background:white; padding:15px 25px; border-radius:12px; box-shadow:0 8px 25px rgba(0,0,0,0.2); z-index:9999; }
  .sidebar { width:280px; background: linear-gradient(180deg, #FF6B9D 0%, #C44569 50%, #A18CD1 100%); color:white; padding:25px 20px; position:fixed; height:100vh; overflow-y:auto; }
- .user-info { background:rgba(255,255,255,0.15); padding:18px; border-radius:15px; margin-bottom:25px; }
+ .user-info { background:rgba(255,255,255,0.15); padding:18px; border-radius:15px; margin-bottom:25px; display:flex; align-items:center; gap:12px; }
+ .avatar { width:45px; height:45px; border-radius:50%; background:linear-gradient(135deg, #FFD700, #FFA500); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; color:#000; }
  .menu-btn { width:100%; padding:14px 18px; margin:8px 0; background:rgba(255,255,255,0.1); color:white; border:none; border-radius:12px; text-align:left; font-size:15px; cursor:pointer; display:flex; align-items:center; gap:12px; }
  .menu-btn.active { background:rgba(255,255,255,0.3); border-left:4px solid white; }
  .logout-btn { width:100%; padding:14px; margin-top:30px; background:linear-gradient(90deg, #FF4757, #FF3838); color:white; border:none; border-radius:12px; font-weight:bold; }
@@ -150,7 +151,8 @@ export default function Dashboard() {
  .btn-danger { background:linear-gradient(90deg, #FF4757, #FF3838); }
  .btn-success { background:linear-gradient(90deg, #2ED573, #7BED9F); }
  .btn-cert { background:linear-gradient(90deg, #FFD700, #FFA500); color:#000; font-size:18px; padding:18px 40px; width:100%; max-width:400px; }
- .project-card,.app-card,.notif-card { background:white; padding:22px; border-radius:15px; margin:15px 0; border:1px solid #eee; }
+ .project-card,.app-card,.notif-card { background:white; padding:22px; border-radius:15px; margin:15px 0; border:1px solid #eee; display:flex; gap:15px; align-items:flex-start; }
+ .app-avatar { width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg, #A18CD1, #FF6B9D); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; color:white; flex-shrink:0; }
  .badge { display:inline-block; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; }
  .badge-pending { background:#FFF3CD; color:#856404; }
  .badge-accepted { background:#D4EDDA; color:#155724; }
@@ -167,14 +169,17 @@ export default function Dashboard() {
       <button className="hamburger" onClick={()=>setMenuOpen(!menuOpen)}>☰</button>
       <div className={`sidebar ${menuOpen? 'open' : ''}`}>
         <h2>🎓 SRIT Portal</h2>
-        <div className="user-info"><h4>{user.name}</h4><p>Roll: {user.roll}</p><p>Dept: {user.dept}</p></div>
+        <div className="user-info">
+          <div className="avatar">{user.name?.charAt(0)}</div>
+          <div><h4>{user.name}</h4><p>Roll: {user.roll}</p><p>Dept: {user.dept}</p></div>
+        </div>
         {menuItems.map(item => (<button key={item.id} className={`menu-btn ${page===item.id? 'active' : ''}`} onClick={()=>{setPage(item.id); setMenuOpen(false)}}><span>{item.icon}</span> {item.name}</button>))}
         <button className="logout-btn" onClick={handleLogout}>🚪 Logout</button>
       </div>
 
       <div className="main">
         {page==="dashboard" && (<div><div className="card"><h1>Welcome {user.name}! 🎉</h1></div></div>)}
-        {page==="projects" && (<div className="card"><h2>💼 Browse Projects</h2>{projects.map(p => (<div key={p.id} className="project-card"><h3>{p.title}</h3><p>{p.desc}</p></div>))}</div>)}
+        {page==="projects" && (<div className="card"><h2>💼 Browse Projects</h2>{projects.map(p => (<div key={p.id} className="project-card"><div className="app-avatar">{p.createdByName?.charAt(0)}</div><div><h3>{p.title}</h3><p>{p.desc}</p></div></div>))}</div>)}
         {page==="create" && (<div className="card"><h2>✨ Create Project</h2><input className="input" placeholder="Title" value={newProject.title} onChange={e=>setNewProject({...newProject, title:e.target.value})} /><textarea className="textarea" placeholder="Description" value={newProject.desc} onChange={e=>setNewProject({...newProject, desc:e.target.value})} /><button className="btn" onClick={createProject}>Create</button></div>)}
         {page==="apply" && (<div className="card"><h2>📝 Apply</h2><select className="select" value={applyData.projectId} onChange={e=>setApplyData({...applyData, projectId:e.target.value})}><option value="">-- Select --</option>{projects.filter(p=>p.createdBy!==user.roll).map(p => <option key={p.id} value={p.id}>{p.title}</option>)}</select><textarea className="textarea" placeholder="Reason" value={applyData.reason} onChange={e=>setApplyData({...applyData, reason:e.target.value})} /><button className="btn" onClick={applyProject}>Submit</button></div>)}
 
@@ -182,9 +187,12 @@ export default function Dashboard() {
           <div className="card"><h2>📄 My Applications</h2>
             {applications.filter(a=>a.studentRoll===user.roll).map(a => (
               <div key={a.id} className="app-card">
-                <h4>{a.projectTitle}</h4>
-                <p><b>Status:</b> <span className={`badge badge-${a.status}`}>{a.status}</span></p>
-                {/* HERE NO CERTIFICATE BUTTON */}
+                <div className="app-avatar">{a.studentName?.charAt(0)}</div>
+                <div>
+                  <h4>{a.projectTitle}</h4>
+                  <p><b>Status:</b> <span className={`badge badge-${a.status}`}>{a.status}</span></p>
+                  {/* HERE NO CERTIFICATE BUTTON */}
+                </div>
               </div>
             ))}
           </div>
@@ -194,10 +202,13 @@ export default function Dashboard() {
           <div className="card"><h2>📋 Review</h2>
             {applications.filter(a=>projects.find(p=>p.id==a.projectId)?.createdBy===user.roll).map(a => (
               <div key={a.id} className="app-card">
-                <h4>{a.studentName} - {a.studentRoll}</h4>
-                <p><b>Project:</b> {a.projectTitle}</p>
-                <span className={`badge badge-${a.status}`}>{a.status}</span>
-                {a.status==="pending" && (<div><button className="btn btn-success" onClick={()=>updateApplicationStatus(a.firebaseKey, "accepted", a)}>✅ Accept</button><button className="btn btn-danger" onClick={()=>updateApplicationStatus(a.firebaseKey, "rejected", a)}>❌ Reject</button></div>)}
+                <div className="app-avatar">{a.studentName?.charAt(0)}</div>
+                <div style={{width:"100%"}}>
+                  <h4>{a.studentName} - {a.studentRoll}</h4>
+                  <p><b>Project:</b> {a.projectTitle}</p>
+                  <span className={`badge badge-${a.status}`}>{a.status}</span>
+                  {a.status==="pending" && (<div style={{marginTop:"10px"}}><button className="btn btn-success" onClick={()=>updateApplicationStatus(a.firebaseKey, "accepted", a)}>✅ Accept</button><button className="btn btn-danger" onClick={()=>updateApplicationStatus(a.firebaseKey, "rejected", a)}>❌ Reject</button></div>)}
+                </div>
               </div>
             ))}
           </div>
