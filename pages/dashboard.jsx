@@ -3,15 +3,14 @@ import { useRouter } from "next/router";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set, onValue, push, update } from 'firebase/database';
 
-// ==================== FIREBASE CONFIG ====================
 const firebaseConfig = {
-  apiKey: "AIzaSyDra1qwWqvST3DoCKUCrfjw6jYAR6W35gg",
+  apiKey: "PASTE_YOUR_APIKEY_HERE",
   authDomain: "srit-mini-internship.firebaseapp.com",
   databaseURL: "https://srit-mini-internship-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "srit-mini-internship",
-  storageBucket: "srit-mini-internship.firebasestorage.app",
-  messagingSenderId: "301325399899",
-  appId: "1:301325399899:web:3791ba62f63f4061930c7e"
+  storageBucket: "srit-mini-internship.appspot.com",
+  messagingSenderId: "PASTE_YOUR_SENDERID_HERE",
+  appId: "PASTE_YOUR_APPID_HERE"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -51,9 +50,7 @@ export default function Dashboard() {
       const data = snapshot.val();
       const appsArray = [];
       if(data){
-        Object.keys(data).forEach(key => { // FIX: key kuda save chesthunna
-          appsArray.push({firebaseKey: key,...data[key]});
-        })
+        Object.keys(data).forEach(key => { appsArray.push({firebaseKey: key,...data[key]}); })
       }
       setApplications(appsArray);
     });
@@ -65,9 +62,7 @@ export default function Dashboard() {
   },[])
 
   const addNotification = (roll, message) => {
-    set(push(ref(db, `notifications/${roll}`)), {
-      id: Date.now().toString(), message, time: new Date().toLocaleString(), read: false
-    });
+    set(push(ref(db, `notifications/${roll}`)), {id: Date.now().toString(), message, time: new Date().toLocaleString(), read: false});
   }
 
   const [newProject, setNewProject] = useState({title:"", desc:"", teamSize:"3"});
@@ -90,7 +85,6 @@ export default function Dashboard() {
     showToast("✅ Applied Successfully!");
   }
 
-  // FIX: Status update bug - firebaseKey tho update chesthunna
   const updateApplicationStatus = (firebaseKey, newStatus, appData) => {
     update(ref(db, `applications/${firebaseKey}`), {status: newStatus});
     const msg = newStatus === "accepted"? `🎉 Your application for "${appData.projectTitle}" is ACCEPTED!` : `❌ Your application for "${appData.projectTitle}" is REJECTED.`;
@@ -98,45 +92,31 @@ export default function Dashboard() {
     showToast(`✅ Application ${newStatus}`);
   }
 
-  // COLORFUL CERTIFICATE WITH BORDER DESIGN
   const generateCertificate = (appData) => {
     const proj = projects.find(p=>p.id==appData.projectId);
     const certWindow = window.open('', '_blank');
     certWindow.document.write(`
       <html>
-        <head><title>Certificate</title>
+        <head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Certificate</title>
         <style>
-          body { font-family: 'Arial'; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:30px; }
-        .border { background: linear-gradient(45deg, #FF6B9D, #A18CD1, #FFD700); padding:10px; border-radius:25px; }
-        .cert { background:white; border-radius:20px; padding:50px; text-align:center; position:relative; }
-        .cert:before { content:''; position:absolute; top:20px; left:20px; right:20px; bottom:20px; border:3px dashed #A18CD1; border-radius:15px; }
-          h1 { color:#A18CD1; font-size:42px; margin-bottom:20px; }
-          h2 { color:#FF6B9D; font-size:32px; margin:20px 0; }
-         .seal { font-size:60px; margin:20px; }
+          *{margin:0; padding:0; box-sizing:border-box;}
+          body { font-family: 'Arial'; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:20px; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+      .border { background: linear-gradient(45deg, #FF6B9D, #A18CD1, #FFD700); padding:8px; border-radius:25px; width:100%; max-width:900px; }
+      .cert { background:white; border-radius:20px; padding:30px 20px; text-align:center; position:relative; }
+      .cert:before { content:''; position:absolute; top:15px; left:15px; right:15px; bottom:15px; border:3px dashed #A18CD1; border-radius:15px; }
+          h1 { color:#A18CD1; font-size:clamp(24px, 5vw, 42px); margin-bottom:15px; }
+          h2 { color:#FF6B9D; font-size:clamp(18px, 4vw, 32px); margin:15px 0; }
+       .seal { font-size:clamp(40px, 8vw, 60px); margin:15px; }
+         p { font-size:clamp(12px, 2.5vw, 16px); }
+          @media print { body { background:white; padding:0; }.border { padding:5px; } }
         </style>
         </head>
         <body>
-          <div class="border">
-            <div class="cert">
-              <div class="seal">🏆</div>
-              <h1>CERTIFICATE OF COMPLETION</h1>
-              <p style="font-size:18px;">This is to proudly certify that</p>
-              <h2>${appData.studentName}</h2>
-              <p style="font-size:16px;">Roll: ${appData.studentRoll} | Dept: ${appData.studentDept} | Year: ${appData.studentYear}</p>
-              <p style="font-size:18px; margin:20px 0;">has successfully completed the project</p>
-              <h2>"${proj?.title}"</h2>
-              <p style="font-size:16px;">at <b>SRIT College</b></p>
-              <p style="margin-top:30px;">Date: ${new Date().toLocaleDateString()}</p>
-              <br><br>
-              <p>___________________</p>
-              <p><b>Project Manager: ${proj?.createdByName}</b></p>
-            </div>
-          </div>
+          <div class="border"><div class="cert"><div class="seal">🏆</div><h1>CERTIFICATE OF COMPLETION</h1><p>This is to proudly certify that</p><h2>${appData.studentName}</h2><p>Roll: ${appData.studentRoll} | Dept: ${appData.studentDept} | Year: ${appData.studentYear}</p><p style="margin:15px 0;">has successfully completed the project</p><h2>"${proj?.title}"</h2><p>at <b>SRIT College</b></p><p style="margin-top:20px;">Date: ${new Date().toLocaleDateString()}</p><br><p>___________________</p><p><b>Project Manager: ${proj?.createdByName}</b></p></div></div>
         </body>
       </html>
     `);
     certWindow.document.close();
-    certWindow.print();
   }
 
   const handleLogout = () => { localStorage.removeItem("currentUser"); router.push("/"); }
@@ -153,47 +133,51 @@ export default function Dashboard() {
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: 'Poppins'; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; }
-    .toast { position:fixed; top:20px; right:20px; background:white; padding:15px 25px; border-radius:12px; box-shadow:0 8px 25px rgba(0,0,0,0.2); z-index:9999; }
-    .sidebar { width:280px; background: linear-gradient(180deg, #FF6B9D 0%, #C44569 50%, #A18CD1 100%); color:white; padding:25px 20px; position:fixed; height:100vh; }
-    .sidebar h2 { font-size:26px; margin-bottom:20px; font-weight:700; }
-    .user-info { background:rgba(255,255,255,0.15); padding:18px; border-radius:15px; margin-bottom:25px; }
-    .menu-btn { width:100%; padding:14px 18px; margin:8px 0; background:rgba(255,255,255,0.1); color:white; border:none; border-radius:12px; text-align:left; font-size:15px; cursor:pointer; display:flex; align-items:center; gap:12px; }
-    .menu-btn.active { background:rgba(255,255,255,0.3); border-left:4px solid white; }
-    .logout-btn { width:100%; padding:14px; margin-top:30px; background:linear-gradient(90deg, #FF4757, #FF3838); color:white; border:none; border-radius:12px; font-weight:bold; }
-    .main { margin-left:280px; padding:30px; }
-    .card { background:rgba(255,255,255,0.98); padding:30px; border-radius:20px; margin-bottom:25px; box-shadow:0 8px 32px rgba(0,0,0,0.12); border-left:5px solid #A18CD1; }
-    .card h1 { color:#A18CD1; font-size:28px; font-weight:700; }
-    .card h2 { color:#FF6B9D; font-size:24px; border-bottom:2px solid #f0f0f0; padding-bottom:12px; }
-    .input,.textarea,.select { width:100%; padding:14px; margin:12px 0; border:2px solid #e0e0e0; border-radius:12px; }
-    .btn { padding:14px 30px; background:linear-gradient(90deg, #FF6B9D, #A18CD1); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:600; margin:5px; }
-    .btn-danger { background:linear-gradient(90deg, #FF4757, #FF3838); }
-    .btn-success { background:linear-gradient(90deg, #2ED573, #7BED9F); }
-    .btn-cert { background:linear-gradient(90deg, #FFD700, #FFA500); color:#000; font-size:18px; padding:18px 40px; }
-    .project-card,.app-card,.notif-card { background:white; padding:22px; border-radius:15px; margin:15px 0; border:1px solid #eee; }
-    .badge { display:inline-block; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; }
-    .badge-pending { background:#FFF3CD; color:#856404; }
-    .badge-accepted { background:#D4EDDA; color:#155724; }
-    .badge-rejected { background:#F8D7DA; color:#721C24; }
-    .hamburger { display:none; }
-        @media (max-width: 1023px) {.sidebar { transform: translateX(-100%); position:fixed; }.sidebar.open { transform: translateX(0); }.main { margin-left:0; }.hamburger { display:block; position:fixed; top:15px; right:15px; background:#A18CD1; color:white; border:none; padding:12px 15px; border-radius:10px; font-size:22px; z-index:1000; } }
-    .stats-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px; }
-    .stat-card { background:linear-gradient(135deg, #FF6B9D, #A18CD1); color:white; padding:28px; border-radius:15px; text-align:center; }
-    .info-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin:15px 0; }
-    .info-item { padding:12px; background:#f8f9fa; border-radius:10px; border-left:3px solid #A18CD1; }
+  .toast { position:fixed; top:20px; right:20px; background:white; padding:15px 25px; border-radius:12px; box-shadow:0 8px 25px rgba(0,0,0,0.2); z-index:9999; }
+  .sidebar { width:280px; background: linear-gradient(180deg, #FF6B9D 0%, #C44569 50%, #A18CD1 100%); color:white; padding:25px 20px; position:fixed; height:100vh; overflow-y:auto; }
+  .user-info { background:rgba(255,255,255,0.15); padding:18px; border-radius:15px; margin-bottom:25px; display:flex; align-items:center; gap:12px; }
+  .avatar { width:45px; height:45px; border-radius:50%; background:linear-gradient(135deg, #FFD700, #FFA500); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; color:#000; }
+  .menu-btn { width:100%; padding:14px 18px; margin:8px 0; background:rgba(255,255,255,0.1); color:white; border:none; border-radius:12px; text-align:left; font-size:15px; cursor:pointer; display:flex; align-items:center; gap:12px; }
+  .menu-btn.active { background:rgba(255,255,255,0.3); border-left:4px solid white; }
+  .logout-btn { width:100%; padding:14px; margin-top:30px; background:linear-gradient(90deg, #FF4757, #FF3838); color:white; border:none; border-radius:12px; font-weight:bold; }
+  .main { margin-left:280px; padding:30px; }
+  .card { background:rgba(255,255,255,0.98); padding:30px; border-radius:20px; margin-bottom:25px; box-shadow:0 8px 32px rgba(0,0,0,0.12); border-left:5px solid #A18CD1; }
+  .card h1 { color:#A18CD1; font-size:28px; font-weight:700; }
+  .card h2 { color:#FF6B9D; font-size:24px; border-bottom:2px solid #f0f0f0; padding-bottom:12px; }
+  .input,.textarea,.select { width:100%; padding:14px; margin:12px 0; border:2px solid #e0e0e0; border-radius:12px; }
+  .btn { padding:14px 30px; background:linear-gradient(90deg, #FF6B9D, #A18CD1); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:600; margin:5px; }
+  .btn-danger { background:linear-gradient(90deg, #FF4757, #FF3838); }
+  .btn-success { background:linear-gradient(90deg, #2ED573, #7BED9F); }
+  .btn-cert { background:linear-gradient(90deg, #FFD700, #FFA500); color:#000; font-size:18px; padding:18px 40px; width:100%; max-width:400px; }
+  .project-card,.app-card,.notif-card { background:white; padding:22px; border-radius:15px; margin:15px 0; border:1px solid #eee; display:flex; gap:15px; align-items:flex-start; }
+  .app-avatar { width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg, #A18CD1, #FF6B9D); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; color:white; flex-shrink:0; }
+  .badge { display:inline-block; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; }
+  .badge-pending { background:#FFF3CD; color:#856404; }
+  .badge-accepted { background:#D4EDDA; color:#155724; }
+  .badge-rejected { background:#F8D7DA; color:#721C24; }
+  .hamburger { display:none; }
+        @media (max-width: 1023px) {.sidebar { transform: translateX(-100%); position:fixed; z-index:999; }.sidebar.open { transform: translateX(0); }.main { margin-left:0; padding:20px; }.hamburger { display:block; position:fixed; top:15px; right:15px; background:#A18CD1; color:white; border:none; padding:12px 15px; border-radius:10px; font-size:22px; z-index:1000; } }
+  .stats-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px; }
+  .stat-card { background:linear-gradient(135deg, #FF6B9D, #A18CD1); color:white; padding:28px; border-radius:15px; text-align:center; }
+  .info-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin:15px 0; }
+  .info-item { padding:12px; background:#f8f9fa; border-radius:10px; border-left:3px solid #A18CD1; }
       `}</style>
 
       {toast && <div className="toast">{toast}</div>}
       <button className="hamburger" onClick={()=>setMenuOpen(!menuOpen)}>☰</button>
       <div className={`sidebar ${menuOpen? 'open' : ''}`}>
         <h2>🎓 SRIT Portal</h2>
-        <div className="user-info"><h4>{user.name}</h4><p>Roll: {user.roll}</p><p>Dept: {user.dept}</p></div>
+        <div className="user-info">
+          <div className="avatar">{user.name?.charAt(0)}</div>
+          <div><h4>{user.name}</h4><p>Roll: {user.roll}</p><p>Dept: {user.dept}</p></div>
+        </div>
         {menuItems.map(item => (<button key={item.id} className={`menu-btn ${page===item.id? 'active' : ''}`} onClick={()=>{setPage(item.id); setMenuOpen(false)}}><span>{item.icon}</span> {item.name}</button>))}
         <button className="logout-btn" onClick={handleLogout}>🚪 Logout</button>
       </div>
 
       <div className="main">
         {page==="dashboard" && (<div><div className="card"><h1>Welcome {user.name}! 🎉</h1></div></div>)}
-        {page==="projects" && (<div className="card"><h2>💼 Browse Projects</h2>{projects.map(p => (<div key={p.id} className="project-card"><h3>{p.title}</h3><p>{p.desc}</p></div>))}</div>)}
+        {page==="projects" && (<div className="card"><h2>💼 Browse Projects</h2>{projects.map(p => (<div key={p.id} className="project-card"><div className="app-avatar">{p.createdByName?.charAt(0)}</div><div><h3>{p.title}</h3><p>{p.desc}</p><p><b>By:</b> {p.createdByName}</p></div></div>))}</div>)}
         {page==="create" && (<div className="card"><h2>✨ Create Project</h2><input className="input" placeholder="Title" value={newProject.title} onChange={e=>setNewProject({...newProject, title:e.target.value})} /><textarea className="textarea" placeholder="Description" value={newProject.desc} onChange={e=>setNewProject({...newProject, desc:e.target.value})} /><button className="btn" onClick={createProject}>Create</button></div>)}
         {page==="apply" && (<div className="card"><h2>📝 Apply</h2><select className="select" value={applyData.projectId} onChange={e=>setApplyData({...applyData, projectId:e.target.value})}><option value="">-- Select --</option>{projects.filter(p=>p.createdBy!==user.roll).map(p => <option key={p.id} value={p.id}>{p.title}</option>)}</select><textarea className="textarea" placeholder="Reason" value={applyData.reason} onChange={e=>setApplyData({...applyData, reason:e.target.value})} /><button className="btn" onClick={applyProject}>Submit</button></div>)}
 
@@ -201,9 +185,12 @@ export default function Dashboard() {
           <div className="card"><h2>📄 My Applications</h2>
             {applications.filter(a=>a.studentRoll===user.roll).map(a => (
               <div key={a.id} className="app-card">
-                <h4>{a.projectTitle}</h4>
-                <p><b>Status:</b> <span className={`badge badge-${a.status}`}>{a.status}</span></p>
-                {/* Certificate button teesesa ikkada nunchi */}
+                <div className="app-avatar">{a.studentName?.charAt(0)}</div>
+                <div>
+                  <h4>{a.projectTitle}</h4>
+                  <p><b>Name:</b> {a.studentName}</p>
+                  <p><b>Status:</b> <span className={`badge badge-${a.status}`}>{a.status}</span></p>
+                </div>
               </div>
             ))}
           </div>
@@ -213,10 +200,14 @@ export default function Dashboard() {
           <div className="card"><h2>📋 Review</h2>
             {applications.filter(a=>projects.find(p=>p.id==a.projectId)?.createdBy===user.roll).map(a => (
               <div key={a.id} className="app-card">
-                <h4>{a.studentName} - {a.studentRoll}</h4>
-                <p><b>Project:</b> {a.projectTitle}</p>
-                <span className={`badge badge-${a.status}`}>{a.status}</span>
-                {a.status==="pending" && (<div><button className="btn btn-success" onClick={()=>updateApplicationStatus(a.firebaseKey, "accepted", a)}>✅ Accept</button><button className="btn btn-danger" onClick={()=>updateApplicationStatus(a.firebaseKey, "rejected", a)}>❌ Reject</button></div>)}
+                <div className="app-avatar">{a.studentName?.charAt(0)}</div>
+                <div style={{width:"100%"}}>
+                  <h4>{a.studentName} - {a.studentRoll}</h4>
+                  <p><b>Project:</b> {a.projectTitle}</p>
+                  <p><b>Dept:</b> {a.studentDept} | <b>Year:</b> {a.studentYear}</p>
+                  <span className={`badge badge-${a.status}`}>{a.status}</span>
+                  {a.status==="pending" && (<div style={{marginTop:"10px"}}><button className="btn btn-success" onClick={()=>updateApplicationStatus(a.firebaseKey, "accepted", a)}>✅ Accept</button><button className="btn btn-danger" onClick={()=>updateApplicationStatus(a.firebaseKey, "rejected", a)}>❌ Reject</button></div>)}
+                </div>
               </div>
             ))}
           </div>
@@ -230,10 +221,9 @@ export default function Dashboard() {
               <div className="info-item"><b>Dept:</b> {user.dept}</div>
               <div className="info-item"><b>Year:</b> {user.year}</div>
             </div>
-            {/* CERTIFICATE BUTTON IKADA PETTANU BROO */}
-            <h3 style={{marginTop:"30px", color:"#A18CD1"}}>🏆 Your Certificates</h3>
+            <h3 style={{marginTop:"30px", color:"#A18CD1", textAlign:"center"}}>🏆 Your Certificates</h3>
             {applications.filter(a=>a.studentRoll===user.roll && a.status==="accepted").length===0?
-              <p>No certificates yet. Get accepted to a project first!</p> :
+              <p style={{textAlign:"center"}}>No certificates yet. Get accepted to a project first!</p> :
               applications.filter(a=>a.studentRoll===user.roll && a.status==="accepted").map(a => (
                 <div key={a.id} style={{textAlign:"center", marginTop:"20px"}}>
                   <p><b>{a.projectTitle}</b></p>
